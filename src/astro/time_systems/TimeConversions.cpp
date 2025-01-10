@@ -190,3 +190,13 @@ double getJulianCenturiesOfTT(double timej2k) {
     double t_tt = std::get<0>(auxTuple);
     return t_tt;
 }
+
+// convert Julian centuries to Julian Date
+double T_to_JD(double T) {
+    return T * 36525.0 + 2451545.0;
+}
+
+// convert j2k seconds to Julian centuries
+double secondsToT(double timej2k) {
+    return timej2k / (86400.0 * 36525.0);
+}

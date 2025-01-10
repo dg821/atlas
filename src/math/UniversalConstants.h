@@ -14,6 +14,7 @@ namespace UniversalConstants {
     constexpr double D2R = std::numbers::pi / 180.0;
     constexpr double ARCSECONDS_2_DEGREES = 1.0 / 3600.0;
     constexpr double ARCSECONDS_2_RAD = ARCSECONDS_2_DEGREES * D2R;
+    constexpr double AU_2_KM = 149597870.7;  // 1 AU in kilometers
 
     // Physical constants
     constexpr double BIG_G = 6.67430e-20;  // Gravitational constant [km^3 kg^-1 s^-2]

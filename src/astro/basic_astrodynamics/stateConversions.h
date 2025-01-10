@@ -7,7 +7,6 @@
 #include "../../math/UniversalConstants.h"
 #include "../../math/utilities/MathFunctions.h"
 
-// Default value for Earth's gravitational parameter (in km^3/s^2)
 namespace stateConversion {
     constexpr double mu = UniversalConstants::EarthParams::MU;
 

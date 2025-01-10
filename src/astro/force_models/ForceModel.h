@@ -8,6 +8,7 @@
 #include "ExponentialDragLookupTable.h"
 #include "../../math/UniversalConstants.h"
 #include <cmath>
+#include "../../input_ouput/planetary_ephemerides/meeusEphemeris.h"
 
 
 class ForceModel {
@@ -50,3 +51,11 @@ public:
     Eigen::Vector3d computeAcceleration(double t, const SpaceVehicle& sv) const override;
 };
 
+
+class LunisolarThirdBodyForce : public ForceModel {
+public:
+    LunisolarThirdBodyForce();
+    ~LunisolarThirdBodyForce() override;
+    std::string getName() const override;
+    Eigen::Vector3d computeAcceleration(double t, const SpaceVehicle& sv) const override;
+};

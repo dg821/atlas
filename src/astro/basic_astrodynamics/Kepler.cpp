@@ -5,8 +5,8 @@
 #include "Kepler.h"
 
 std::pair<Eigen::Vector3d, Eigen::Vector3d> solveKepler(const Eigen::Vector3d& r0, const Eigen::Vector3d& v0, const double dt, const double mu) {
-    constexpr double eps = 1e-8; // Convergence tolerance
-    constexpr int maxIter = 50; // Maximum number of iterations
+    constexpr double eps = 1e-8;            // convergence tolerance
+    constexpr int maxIter = 50;             // maximum number of iterations
 
     const double r0_norm = r0.norm();
     const double v0_norm = v0.norm();
@@ -52,7 +52,7 @@ std::pair<Eigen::Vector3d, Eigen::Vector3d> solveKepler(const Eigen::Vector3d& r
     // Calculate new position and velocity in the orbital plane
     const double cosE = std::cos(E);
     const double sinE = std::sin(E);
-    const double f = sma * (cosE - ecc);
+    const double f = sma * (cosE - ecc);                                // f and g functions
     const double g = sma * std::sqrt(1 - ecc * ecc) * sinE;
     const double fdot = -sma * sma * n * sinE / r0_norm;
     const double gdot = sma * sma * n * (cosE - ecc) / r0_norm;

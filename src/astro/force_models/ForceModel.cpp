@@ -55,8 +55,8 @@ Eigen::Vector3d DragExpForce::computeAcceleration(double t, const SpaceVehicle& 
     Eigen::Vector3d v = state.v;
     Eigen::Vector3d r = state.r;
 
-    double mass = sv.get_mass().value();
-    double area = sv.get_surface_area().value();
+    double mass = sv.get_mass().value();                    // kg
+    double area = sv.get_surface_area().value() * 1e-6;       // km (for unit agreement)
 
     double coeffDrag = 2.2;         // upper atmosphere flat plate model
 
@@ -69,7 +69,7 @@ Eigen::Vector3d DragExpForce::computeAcceleration(double t, const SpaceVehicle& 
 
     AtmosphereDensityTable atmosphere;
     double hAboveEllipsoid = r.norm() - rEq;
-    double airDensity = atmosphere.getDensity(hAboveEllipsoid);
+    double airDensity = atmosphere.getDensity(hAboveEllipsoid) * 1e9;             // kg / km^3 (for unit agreement)
 
     Eigen::Vector3d acceleration = (-1.0/2.0) * (coeffDrag * area / mass) * airDensity * relVel2 * relVelUnit;
 
@@ -81,16 +81,51 @@ std::string DragExpForce::getName() const {
 }
 
 
-
 Eigen::Vector3d SimpleSRPForce::computeAcceleration(double t, const SpaceVehicle& sv) const {
 
-    double pSRP = 4.57e-6;          // N/m^2
+    double pSRP = 4.57e-6 * 1e3;          // N/m^2
+    double reflectivity = 1.0;          // Approximated value. can vary between [0.0, 2.0]
+    double area = sv.get_surface_area().value() * 1e-6;         // km (for unit agreement)
+    double mass = sv.get_mass().value();
 
-    Eigen::Vector3d acceleration;
+    Eigen::Vector3d rSun = MeeusVectors::getSunVec(t);
+    Eigen::Vector3d rSv2Sun = rSun - sv.get_state().value().r;
+
+    Eigen::Vector3d acceleration = -(pSRP * reflectivity * area / mass) * (rSv2Sun / rSv2Sun.norm());
 
     return acceleration;
 }
 
 std::string SimpleSRPForce::getName() const {
     return "Simple SRP";
+}
+
+Eigen::Vector3d LunisolarThirdBodyForce::computeAcceleration(double t, const SpaceVehicle& sv) const {
+
+    Eigen::Vector3d rSun = MeeusVectors::getSunVec(t);
+    Eigen::Vector3d rMoon = MeeusVectors::getMoonVec(t);
+
+    double muSun = UniversalConstants::SunParams::MU;
+    double muMoon = UniversalConstants::MoonParams::MU;
+
+    Eigen::Vector3d r = sv.get_state().value().r;
+
+    Eigen::Vector3d rSv2Sun = rSun - r;
+    Eigen::Vector3d rSv2Moon = rMoon - r;
+
+    double rSunMag = rSun.norm();
+    double rMoonMag = rMoon.norm();
+    double rSv2SunMag = rSv2Sun.norm();
+    double rSv2MoonMag = rSv2Moon.norm();
+
+    Eigen::Vector3d accFromSun = muSun * (rSv2Sun / (rSv2SunMag * rSv2SunMag * rSv2SunMag) - rSun / (rSunMag * rSunMag * rSunMag));
+    Eigen::Vector3d accFromMoon = muMoon * (rSv2Moon / (rSv2MoonMag * rSv2MoonMag * rSv2MoonMag) - rMoon / (rMoonMag * rMoonMag * rMoonMag));
+
+    Eigen::Vector3d acceleration = accFromSun + accFromMoon;
+
+    return acceleration;
+}
+
+std::string LunisolarThirdBodyForce::getName() const {
+    return "Lunisolar Third Body";
 }

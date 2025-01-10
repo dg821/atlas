@@ -71,8 +71,7 @@ public:
     double getDensity(double altitudeAboveEllipsoid) const {
         AtmosphereLayer layer = getLayer(altitudeAboveEllipsoid);
         double delta_h = altitudeAboveEllipsoid - layer.base_altitude;
-        return layer.nominal_density *
-               std::exp(-delta_h / layer.scale_height);
+        return layer.nominal_density * std::exp(-delta_h / layer.scale_height);
     }
 };
 

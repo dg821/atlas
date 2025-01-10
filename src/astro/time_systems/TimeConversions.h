@@ -33,4 +33,7 @@ namespace timeConversions {
     double get_delta_ut2(double besselianYear);
     double getAuxiliaryTerrestrialTime(double timej2k);
     double getJulianCenturiesOfTT(double timej2k);
+
+    double T_to_JD(double T);
+    double secondsToT(double timej2k)
 }

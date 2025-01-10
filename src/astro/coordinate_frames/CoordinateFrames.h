@@ -5,7 +5,7 @@
 #pragma once
 #include <Eigen/Dense>
 #include <../../math/utilities/RotationMatrices.h>
-#include <../earth_model/GeodeticModel.h>
+#include <../geodetic_model/GeodeticModel.h>
 #include <../../math/UniversalConstants.h>
 
 namespace coordinateFrames {
