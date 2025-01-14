@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <cmath>
 
+// columns of exponential atmosphere table
 struct AtmosphereLayer {
     double altitude_start;  // km
     double base_altitude;   // km
@@ -17,6 +18,7 @@ struct AtmosphereLayer {
 
 class AtmosphereDensityTable {
 private:
+    // Atmosphere density table from Vallado
     std::vector<AtmosphereLayer> layers = {
         {0.0,   0,    1.225e0,    7.249},
         {25.0,  25,   3.899e-2,   6.349},

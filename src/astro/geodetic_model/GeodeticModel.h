@@ -31,4 +31,16 @@ namespace geodeticModel {
     double getRSiteMagnitude(double horizontalR, double verticalR);
 
     double getLocalSiderealTime(double timej2k, double longitude);
+
+    Eigen::Matrix3d getDCM_itrf2tirs(double timej2k);
+    Eigen::Matrix3d getDCM_tirs2cirs(double timej2k);
+    Eigen::Matrix3d getDCM_cirs2gcrf(double timej2k);
+    Eigen::Matrix3d getDCM_itrf2gcrf(double timej2k);
+
+    std::tuple<Eigen::Vector3d, Eigen::Vector3d> geodeticModel::ecef2eci(Eigen::Vector3d r_ecef, Eigen::Vector3d v_ecef, double timej2k);
+    std::tuple<Eigen::Vector3d, Eigen::Vector3d> eci2ecef(Eigen::Vector3d r_eci, Eigen::Vector3d v_eci, double timej2k);
+
+    std::tuple<Eigen::Vector3d, Eigen::Vector3d, Eigen::Vector3d> geodeticModel::ecef2eci(Eigen::Vector3d r_ecef, Eigen::Vector3d v_ecef, Eigen::Vector3d a_ecef, double timej2k);
+    // std::tuple<Eigen::Vector3d, Eigen::Vector3d, Eigen::Vector3d> eci2ecef(Eigen::Vector3d r_eci, Eigen::Vector3d v_eci, Eigen::Vector3d a_eci, double timej2k);
+
 }
