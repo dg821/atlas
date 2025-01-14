@@ -8,10 +8,12 @@
 #include "ExponentialDragLookupTable.h"
 #include "../../math/UniversalConstants.h"
 #include <cmath>
-#include "../../input_ouput/planetary_ephemerides/meeusEphemeris.h"
+#include "../../input_output/planetary_ephemerides/meeusEphemeris.h"
 #include "../geodetic_model/GeodeticModel.h"
 #include <vector>
 #include <stdexcept>
+#include <fstream>
+#include <sstream>
 
 
 // Each new force model inherits the methods of the abstract class ForceModel
@@ -75,21 +77,25 @@ private:
     static constexpr int MAX_ORDER = 20;
     static constexpr int MAX_DEGREE = 20;
 
+    std::string coefficients_path;
+
     // Gravity coefficients
     std::vector<std::vector<double>> Cnm;
     std::vector<std::vector<double>> Snm;
 
     void initializeCoefficients();
+    bool loadCoefficientsFromFile();
 
     auto computeLegendrePolynomials(double phi) const ->
         std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>>;
 
 public:
-    NonSphericalGravity();          // default constructor using 4x4 model
-    NonSphericalGravity(int n, int m);
+    NonSphericalGravity(int n = DEFAULT_DEGREE, int m = DEFAULT_ORDER,
+                       const std::string& coeff_path = "../../../data/egm96_20x20.csv");
 
     Eigen::Vector3d computeAcceleration(double t, const SpaceVehicle& sv) const;
-    void setOrders(int n, int m);
+    void setDegreeOrder(int n, int m);
+    std::string getCoefficientsPath() const { return coefficients_path; }
 
     std::string getName() const override;
 };

@@ -133,18 +133,55 @@ std::string LunisolarThirdBodyForce::getName() const {
 
 
 void NonSphericalGravity::initializeCoefficients() {
-    // Initialize with zeros
+    // Initialize arrays with zeros
     Cnm = std::vector<std::vector<double>>(degree_n + 1,
         std::vector<double>(order_m + 1, 0.0));
     Snm = std::vector<std::vector<double>>(degree_n + 1,
         std::vector<double>(order_m + 1, 0.0));
 
-    // load EGM96 normalized coefficients
-    // Note: In production code, load complete set of coefficients
-    Cnm[2][0] = -0.484165371736E-03;
-    Cnm[2][2] = 0.243914352398E-05;
-    Snm[2][2] = -0.140016683654E-05;
+    if (!loadCoefficientsFromFile()) {
+        throw std::runtime_error("Failed to load gravity coefficients from file: "
+                               + coefficients_path);
+    }
 }
+
+bool NonSphericalGravity::loadCoefficientsFromFile() {
+    std::ifstream file(coefficients_path);
+    if (!file.is_open()) {
+        return false;
+    }
+
+    std::string line;
+    // Skip header
+    std::getline(file, line);
+
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string value;
+        std::vector<double> row;
+
+        // Parse CSV line
+        while (std::getline(ss, value, ',')) {
+            row.push_back(std::stod(value));
+        }
+
+        if (row.size() != 4) {  // n, m, C, S
+            continue;
+        }
+
+        int n = static_cast<int>(row[0]);
+        int m = static_cast<int>(row[1]);
+
+        // Only store coefficients up to our maximum order
+        if (n <= degree_n && m <= order_m) {
+            Cnm[n][m] = row[2];
+            Snm[n][m] = row[3];
+        }
+    }
+
+    return true;
+}
+
 
 auto NonSphericalGravity::computeLegendrePolynomials(double phi) const ->
     std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> {
@@ -198,13 +235,12 @@ auto NonSphericalGravity::computeLegendrePolynomials(double phi) const ->
     return {Pnm, dPnm};
 }
 
-NonSphericalGravity::NonSphericalGravity()
-    : NonSphericalGravity(DEFAULT_DEGREE, DEFAULT_ORDER) {  // delegate to the other constructor
-}
+NonSphericalGravity::NonSphericalGravity(int n, int m, const std::string& coeff_path)
+    : degree_n(std::min(n, MAX_ORDER)),
+      order_m(m == -1 ? degree_n : std::min(m, MAX_ORDER)),
+      coefficients_path(coeff_path) {
 
-NonSphericalGravity::NonSphericalGravity(int n, int m)
-    : degree_n(std::min(n, MAX_DEGREE)), order_m(std::min(m, MAX_ORDER)) {
-    if (n < 2 || m < 0 || m > n) {
+    if (n < 2 || (m != -1 && (m < 0 || m > n))) {
         throw std::invalid_argument("Invalid gravity model orders");
     }
     initializeCoefficients();
@@ -287,7 +323,7 @@ Eigen::Vector3d NonSphericalGravity::computeAcceleration(double t, const SpaceVe
     return a_eci_out;
 }
 
-void NonSphericalGravity::setOrders(int n, int m) {
+void NonSphericalGravity::setDegreeOrder(int n, int m) {
     if (n < 2 || m < 0 || m > n || n > MAX_ORDER || m > MAX_ORDER) {
         throw std::invalid_argument("Invalid gravity model orders");
     }

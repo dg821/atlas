@@ -12,10 +12,10 @@
 #include <numbers>
 #include <tuple>
 #include "../../math/utilities/MathFunctions.h"
-#include "../../input_ouput/earth_time_and_pole_data/FundamentalArguments.h"
-#include "../../input_ouput/earth_time_and_pole_data/PrecessionNutation_XData.h"
-#include "../../input_ouput/earth_time_and_pole_data/PrecessionNutation_YData.h"
-#include "../../input_ouput/earth_time_and_pole_data/PrecessionNutation_sData.h"
+#include "../../input_output/earth_time_and_pole_data/FundamentalArguments.h"
+#include "../../input_output/earth_time_and_pole_data/PrecessionNutation_XData.h"
+#include "../../input_output/earth_time_and_pole_data/PrecessionNutation_YData.h"
+#include "../../input_output/earth_time_and_pole_data/PrecessionNutation_sData.h"
 
 namespace geodeticModel {
     // earth model
