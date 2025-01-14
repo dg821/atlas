@@ -66,28 +66,30 @@ public:
 };
 
 
-
 class NonSphericalGravity : public ForceModel {
 private:
+    int degree_n;
+    int order_m;
     static constexpr int DEFAULT_ORDER = 4;
-    static constexpr int MAX_ORDER = 50;
+    static constexpr int DEFAULT_DEGREE = 4;
+    static constexpr int MAX_ORDER = 20;
+    static constexpr int MAX_DEGREE = 20;
 
-    int order_n;  // max degree
-    int order_m;  // max order
-    std::vector<std::vector<double>> Cnm;  // normalized cosine coefficients
-    std::vector<std::vector<double>> Snm;  // normalized sine coefficients
-
-    // stored calculations to avoid excessive computations
-    std::vector<std::vector<double>> Pnm;      // associated Legendre polynomials
-    std::vector<std::vector<double>> dPnm;     // derivatives of Legendre polynomials
-    std::vector<double> factorials;            // pre-computed factorials
+    // Gravity coefficients
+    std::vector<std::vector<double>> Cnm;
+    std::vector<std::vector<double>> Snm;
 
     void initializeCoefficients();
-    void computeLegendrePolynomials(double phi);
+
+    auto computeLegendrePolynomials(double phi) const ->
+        std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>>;
 
 public:
-    NonSphericalGravity(int n = DEFAULT_ORDER, int m = DEFAULT_ORDER);
-    Eigen::Vector3d computeAcceleration(double t, const SpaceVehicle& sv) const override;
+    NonSphericalGravity();          // default constructor using 4x4 model
+    NonSphericalGravity(int n, int m);
+
+    Eigen::Vector3d computeAcceleration(double t, const SpaceVehicle& sv) const;
     void setOrders(int n, int m);
+
     std::string getName() const override;
 };

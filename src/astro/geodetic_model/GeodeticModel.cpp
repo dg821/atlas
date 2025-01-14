@@ -301,31 +301,13 @@ std::tuple<Eigen::Vector3d, Eigen::Vector3d, Eigen::Vector3d> geodeticModel::ece
     Eigen::Matrix3d dcm_cirs2gcrf = getDCM_cirs2gcrf(timej2k);
 
     Eigen::Vector3d r_tirs = dcm_itrf2tirs * r_ecef;
-    Eigen::Vector3d v_tirs = dcm_itrf2tirs * v_ecef;        // omega_polar is neglected here (assumed to be extremely small)
+    Eigen::Vector3d v_tirs = dcm_itrf2tirs * v_ecef;        // omega_polar is neglected here (assumed to be small)
 
     Eigen::Vector3d earthRotationVector = {0.0, 0.0, UniversalConstants::EarthParams::ROTATION_RATE};
 
     Eigen::Vector3d v_eci = dcm_cirs2gcrf * dcm_tirs2cirs * (dcm_itrf2tirs * v_ecef + earthRotationVector.cross(r_tirs));
 
-    Eigen::Vector3d a_eci = dcm_cirs2gcrf * dcm_tirs2cirs * (dcm_itrf2tirs * a_ecef + 2 * earthRotationVector.cross(v_tirs) + earthRotationVector.cross(earthRotationVector.cross(r_tirs)));
+    Eigen::Vector3d a_eci = dcm_cirs2gcrf * dcm_tirs2cirs * (dcm_itrf2tirs * a_ecef + 2 * earthRotationVector.cross(v_tirs) + earthRotationVector.cross(earthRotationVector.cross(r_tirs)));      // omegaDot term is neglected
 
     return std::make_tuple(r_eci, v_eci, a_eci);
 }
-
-// std::tuple<Eigen::Vector3d, Eigen::Vector3d, Eigen::Vector3d> geodeticModel::eci2ecef(Eigen::Vector3d r_eci, Eigen::Vector3d v_eci, Eigen::Vector3d, double timej2k) {
-//     Eigen::Matrix3d dcm_gcrf2itrf = getDCM_itrf2gcrf(timej2k).transpose();
-//     Eigen::Vector3d r_ecef = dcm_gcrf2itrf * r_eci;
-//
-//     Eigen::Matrix3d dcm_itrf2tirs = getDCM_itrf2tirs(timej2k);
-//     Eigen::Matrix3d dcm_tirs2cirs = getDCM_tirs2cirs(timej2k);
-//     Eigen::Matrix3d dcm_cirs2gcrf = getDCM_cirs2gcrf(timej2k);
-//
-//     Eigen::Vector3d r_tirs = dcm_itrf2tirs * r_ecef;
-//     Eigen::Vector3d v_tirs = dcm_itrf2tirs * v_ecef;        // omega_polar is neglected here (assumed to be extremely small)
-//
-//     Eigen::Vector3d earthRotationVector = {0.0, 0.0, UniversalConstants::EarthParams::ROTATION_RATE};
-//
-//     Eigen::Vector3d v_ecef = dcm_itrf2tirs.transpose() * (dcm_tirs2cirs.transpose() * dcm_cirs2gcrf.transpose() * v_eci - earthRotationVector.cross(r_tirs));
-//
-//     return std::make_tuple(r_ecef, v_ecef);
-// }

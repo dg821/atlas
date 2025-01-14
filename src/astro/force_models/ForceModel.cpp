@@ -132,31 +132,26 @@ std::string LunisolarThirdBodyForce::getName() const {
 
 
 
-
 void NonSphericalGravity::initializeCoefficients() {
     // Initialize with zeros
-    Cnm = std::vector<std::vector<double>>(order_n + 1,
+    Cnm = std::vector<std::vector<double>>(degree_n + 1,
         std::vector<double>(order_m + 1, 0.0));
-    Snm = std::vector<std::vector<double>>(order_n + 1,
+    Snm = std::vector<std::vector<double>>(degree_n + 1,
         std::vector<double>(order_m + 1, 0.0));
 
     // load EGM96 normalized coefficients
+    // Note: In production code, load complete set of coefficients
     Cnm[2][0] = -0.484165371736E-03;
     Cnm[2][2] = 0.243914352398E-05;
     Snm[2][2] = -0.140016683654E-05;
-    // WCAFTL: Additional coefficients would be loaded here
-    //
-    //
-    //
-    //
 }
 
-void NonSphericalGravity::computeLegendrePolynomials(double phi) {
-    // compute normalized associated Legendre polynomials
-    // initialize arrays
-    Pnm = std::vector<std::vector<double>>(order_n + 1,
+auto NonSphericalGravity::computeLegendrePolynomials(double phi) const ->
+    std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> {
+
+    std::vector<std::vector<double>> Pnm(degree_n + 1,
         std::vector<double>(order_m + 1, 0.0));
-    dPnm = std::vector<std::vector<double>>(order_n + 1,
+    std::vector<std::vector<double>> dPnm(degree_n + 1,
         std::vector<double>(order_m + 1, 0.0));
 
     double sin_phi = std::sin(phi);
@@ -165,37 +160,50 @@ void NonSphericalGravity::computeLegendrePolynomials(double phi) {
 
     // seed values (n=0, m=0)
     Pnm[0][0] = 1.0;
+    dPnm[0][0] = 0.0;
+
+    // Compute P(1,0) and P(1,1) as base cases
+    if (degree_n >= 1) {
+        Pnm[1][0] = sqrt(3.0) * sin_phi;
+        dPnm[1][0] = sqrt(3.0) * cos_phi;
+
+        if (order_m >= 1) {
+            Pnm[1][1] = sqrt(3.0) * cos_phi;
+            dPnm[1][1] = -sqrt(3.0) * sin_phi;
+        }
+    }
 
     // compute polynomials using recursion relations
-    for (int n = 1; n <= order_n; n++) {
+    for (int n = 2; n <= degree_n; n++) {
         // Compute P(n,0)
         double k = sqrt((2*n-1)/(2*n));
         Pnm[n][0] = k * sin_phi * Pnm[n-1][0];
+        dPnm[n][0] = n * sin_phi * Pnm[n][0] - sqrt(n*(n+1)) * cos_phi * Pnm[n-1][0];
 
         // Compute P(n,m) and dP(n,m)
-        for (int m = 0; m <= n && m <= order_m; m++) {
+        for (int m = 1; m <= n && m <= order_m; m++) {
             if (n == m) {
                 Pnm[n][m] = cos_phi * sqrt((2*n+1)/(2*n)) * Pnm[n-1][n-1];
-            }
-            else if (m > 0) {
-                double k1 = sqrt((2*n+1)/((2*n-1)*(n+m)*(n-m)));
-                double k2 = sqrt((2*n+1)*(n+m-1)*(n-m-1)/((2*n-3)*(n+m)*(n-m)));
-                Pnm[n][m] = k1 * sin_phi * Pnm[n-1][m] - k2 * Pnm[n-2][m];
-            }
-
-            // compute derivatives (dP(n,m)/dphi)
-            if (m == n) {
                 dPnm[n][m] = -n * tan_phi * Pnm[n][m];
             }
             else {
+                double k1 = sqrt((2*n+1)/((2*n-1)*(n+m)*(n-m)));
+                double k2 = sqrt((2*n+1)*(n+m-1)*(n-m-1)/((2*n-3)*(n+m)*(n-m)));
+                Pnm[n][m] = k1 * sin_phi * Pnm[n-1][m] - k2 * Pnm[n-2][m];
                 dPnm[n][m] = n * sin_phi * Pnm[n][m] - sqrt((n+m)*(n-m+1)) * cos_phi * Pnm[n][m-1];
             }
         }
     }
+
+    return {Pnm, dPnm};
+}
+
+NonSphericalGravity::NonSphericalGravity()
+    : NonSphericalGravity(DEFAULT_DEGREE, DEFAULT_ORDER) {  // delegate to the other constructor
 }
 
 NonSphericalGravity::NonSphericalGravity(int n, int m)
-    : order_n(std::min(n, MAX_ORDER)), order_m(std::min(m, MAX_ORDER)) {
+    : degree_n(std::min(n, MAX_DEGREE)), order_m(std::min(m, MAX_ORDER)) {
     if (n < 2 || m < 0 || m > n) {
         throw std::invalid_argument("Invalid gravity model orders");
     }
@@ -203,7 +211,6 @@ NonSphericalGravity::NonSphericalGravity(int n, int m)
 }
 
 Eigen::Vector3d NonSphericalGravity::computeAcceleration(double t, const SpaceVehicle& sv) const {
-
     double rEq = UniversalConstants::EarthParams::RADIUS_EQ;
     double mu = UniversalConstants::EarthParams::MU;
 
@@ -223,14 +230,14 @@ Eigen::Vector3d NonSphericalGravity::computeAcceleration(double t, const SpaceVe
     double lambda = std::atan2(y, x);  // longitude
 
     // compute Legendre polynomials and derivatives
-    computeLegendrePolynomials(phi);
+    auto [Pnm, dPnm] = computeLegendrePolynomials(phi);
 
     // initialize acceleration components (spherical coordinates)
     double ar = 0.0;    // radial
     double aphi = 0.0;  // latitudinal
     double alam = 0.0;  // longitudinal
 
-    for (int n = 0; n <= order_n; n++) {
+    for (int n = 2; n <= degree_n; n++) {  // Start from n=2 as n=0,1 terms are not used
         double r_ratio = rEq/r;
         double r_ratio_n = std::pow(r_ratio, n);
 
@@ -284,7 +291,7 @@ void NonSphericalGravity::setOrders(int n, int m) {
     if (n < 2 || m < 0 || m > n || n > MAX_ORDER || m > MAX_ORDER) {
         throw std::invalid_argument("Invalid gravity model orders");
     }
-    order_n = n;
+    degree_n = n;
     order_m = m;
     initializeCoefficients();
 }
