@@ -35,7 +35,7 @@ namespace UniversalConstants {
         constexpr double J3 = -2.5323e-6;   // Earth J3
         constexpr double J4 = -1.6204e-6;  // Earth J4
         constexpr double FLATTENING_FACTOR = 3.3528131e-3;  // Flattening factor []
-        constexpr double ROTATION_RATE = 7.2921150e-5; // Earth's rotation rate [rad/s]
+        constexpr double ROTATION_RATE = 7.292115146706979e-5; // Earth's rotation rate [rad/s]
         constexpr double ECC_EARTH = 0.081819221456;    // Eccentricity []
         constexpr double RADIUS_POL = RADIUS_EQ * (1.0 - FLATTENING_FACTOR);
         constexpr double CHANDLER_WOBBLE = 0.26;        // Chandler Wobble [arcsec]

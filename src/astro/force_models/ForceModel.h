@@ -9,7 +9,12 @@
 #include "../../math/UniversalConstants.h"
 #include <cmath>
 #include "../../input_ouput/planetary_ephemerides/meeusEphemeris.h"
+#include "../geodetic_model/GeodeticModel.h"
+#include <vector>
+#include <stdexcept>
 
+
+// Each new force model inherits the methods of the abstract class ForceModel
 
 class ForceModel {
 public:
@@ -58,4 +63,31 @@ public:
     ~LunisolarThirdBodyForce() override;
     std::string getName() const override;
     Eigen::Vector3d computeAcceleration(double t, const SpaceVehicle& sv) const override;
+};
+
+
+
+class NonSphericalGravity : public ForceModel {
+private:
+    static constexpr int DEFAULT_ORDER = 4;
+    static constexpr int MAX_ORDER = 50;
+
+    int order_n;  // max degree
+    int order_m;  // max order
+    std::vector<std::vector<double>> Cnm;  // normalized cosine coefficients
+    std::vector<std::vector<double>> Snm;  // normalized sine coefficients
+
+    // stored calculations to avoid excessive computations
+    std::vector<std::vector<double>> Pnm;      // associated Legendre polynomials
+    std::vector<std::vector<double>> dPnm;     // derivatives of Legendre polynomials
+    std::vector<double> factorials;            // pre-computed factorials
+
+    void initializeCoefficients();
+    void computeLegendrePolynomials(double phi);
+
+public:
+    NonSphericalGravity(int n = DEFAULT_ORDER, int m = DEFAULT_ORDER);
+    Eigen::Vector3d computeAcceleration(double t, const SpaceVehicle& sv) const override;
+    void setOrders(int n, int m);
+    std::string getName() const override;
 };
