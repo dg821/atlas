@@ -6,7 +6,7 @@
 
 #include <unordered_set>
 #include <cmath>
-#include "../../input_ouput/earth_time_and_pole_data/ExtractTimeAndPoleData.h"
+#include "../../input_output/earth_time_and_pole_data/ExtractTimeAndPoleData.h"
 
 namespace timeConversions {
     struct GregorianDate {

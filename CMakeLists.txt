@@ -18,7 +18,10 @@ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 add_subdirectory(src/math)
 add_subdirectory(src/astro)
 add_subdirectory(tests/math)
-add_subdirectory(src/input_ouput)
+add_subdirectory(src/input_output)
+
+configure_file(${PROJECT_SOURCE_DIR}/data/egm96_20x20.csv
+        ${PROJECT_BINARY_DIR}/data/egm96_20x20.csv COPYONLY)
 
 
 add_executable(atlas main.cpp
