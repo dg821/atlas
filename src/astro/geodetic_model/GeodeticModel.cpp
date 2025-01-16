@@ -60,7 +60,7 @@ std::tuple<double, double, double> geodeticModel::ecef2lla(Eigen::Vector3d rECEF
     double y = rECEF(1);
     double z = rECEF(2);
     double a = R_Eq;
-    double b = std::sqrt(R_Pol * (1 - Ecc * Ecc)) * mathFunctions::sign(z);
+    double b = std::sqrt(R_Pol * (1 - Ecc * Ecc)) * MathFunctions::sign(z);
     double rVert = std::sqrt(x*x + y*y);
 
     double E = (b * z - (a*a - b*b)) / (a * rVert);

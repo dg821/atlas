@@ -139,7 +139,7 @@ protected:
     void SetUp() override {
         auto [sma, ecc, inc, node, argP, truA] = GetParam();
 
-        stateConversion::CartesianState cart = stateConversion::Kep2Cart(sma, ecc, inc, node, argP, truA, mu);
+        stateConversions::CartesianState cart = stateConversions::Kep2Cart(sma, ecc, inc, node, argP, truA, mu);
         initial_state = NumericalIntegrator::StateVector(6);
         initial_state << cart.r(0), cart.r(1), cart.r(2), cart.v(0), cart.v(1), cart.v(2);
 

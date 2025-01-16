@@ -9,6 +9,6 @@
 #include <stdexcept>
 #include "../../math/UniversalConstants.h"
 
-namespace keplerProblem {
+namespace Kepler {
     std::pair<Eigen::Vector3d, Eigen::Vector3d> solveKepler(const Eigen::Vector3d& r0, const Eigen::Vector3d& v0, double dt, double mu=UniversalConstants::EarthParams::MU);
 }
