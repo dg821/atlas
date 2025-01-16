@@ -4,10 +4,11 @@
 
 #pragma once
 #include <Eigen/Dense>
+#include <stdexcept>
 #include "../../math/UniversalConstants.h"
 #include "../../math/utilities/MathFunctions.h"
 
-namespace stateConversion {
+namespace stateConversions {
     constexpr double mu = UniversalConstants::EarthParams::MU;
 
     struct KeplerianElements {
@@ -24,6 +25,8 @@ namespace stateConversion {
     };
 
     double meanA2EccA(double meanA, double ecc);
+
+    double eccA2MeanA(double meanA, double ecc);
 
     double truA2EccA(double truA, double ecc);
 

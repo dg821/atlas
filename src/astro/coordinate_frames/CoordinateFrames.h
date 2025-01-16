@@ -8,7 +8,7 @@
 #include <../geodetic_model/GeodeticModel.h>
 #include <../../math/UniversalConstants.h>
 
-namespace coordinateFrames {
+namespace CoordinateFrames {
 
     // Satellite frame conversions
     Eigen::Matrix3d eci2rsw(Eigen::Vector3d& r_eci, Eigen::Vector3d& v_eci);

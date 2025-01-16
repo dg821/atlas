@@ -27,6 +27,7 @@ target_include_directories(${BASIC_ASTRODYNAMICS_LIB_NAME}
 target_link_libraries(${BASIC_ASTRODYNAMICS_LIB_NAME}
         PUBLIC
         math_lib
+        utilities_lib
         Eigen3::Eigen
 )
 

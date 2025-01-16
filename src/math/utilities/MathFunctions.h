@@ -4,10 +4,12 @@
 
 #pragma once
 #include <cmath>
-#include <exception>
+#include <stdexcept>
 
-namespace mathFunctions {
+namespace MathFunctions {
     double sign(double x);
 
     double wrap2TwoPi(double angle);
+
+    double stableArcCos(double x);
 }
