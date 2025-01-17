@@ -33,9 +33,9 @@ INSTANTIATE_TEST_CASE_P(
         ::testing::Values(6700.0, 7000.0, 42164, 120000),
         ::testing::Values(0.001, 0.001, 0.1, 0.3, 0.5, 0.9),             // Eccentricity
         ::testing::Values(0.001, M_PI/4.0, M_PI/2.0 - 0.001),
-        ::testing::Values(0.0, M_PI/4.0, M_PI/2.0, 3.0*M_PI/4.0, M_PI, 5.0*M_PI/4.0, 3.0*M_PI/2.0, 7.0*M_PI/4.0),
-        ::testing::Values(0.0, M_PI/4.0, M_PI/2.0, 3.0*M_PI/4.0, M_PI, 5.0*M_PI/4.0, 3.0*M_PI/2.0, 7.0*M_PI/4.0),
-        ::testing::Values(0.0, M_PI/4.0, M_PI/2.0, 3.0*M_PI/4.0, M_PI, 5.0*M_PI/4.0, 3.0*M_PI/2.0, 7.0*M_PI/4.0)
+        ::testing::Values(-M_PI/4.0, -M_PI/2.0, -3.0 * M_PI/4.0, -M_PI, -5.0 * M_PI/4.0, -3.0*M_PI/2.0, -7.0 * M_PI/4.0, 0.0, M_PI/4.0, M_PI/2.0, 3.0 * M_PI/4.0, M_PI, 5.0 * M_PI/4.0, 3.0*M_PI/2.0, 7.0 * M_PI/4.0),
+        ::testing::Values(-M_PI/4.0, -M_PI/2.0, -3.0 * M_PI/4.0, -M_PI, -5.0 * M_PI/4.0, -3.0*M_PI/2.0, -7.0 * M_PI/4.0, 0.0, M_PI/4.0, M_PI/2.0, 3.0 * M_PI/4.0, M_PI, 5.0 * M_PI/4.0, 3.0*M_PI/2.0, 7.0 * M_PI/4.0),
+        ::testing::Values(-M_PI/4.0, -M_PI/2.0, -3.0 * M_PI/4.0, -M_PI, -5.0 * M_PI/4.0, -3.0*M_PI/2.0, -7.0 * M_PI/4.0, 0.0, M_PI/4.0, M_PI/2.0, 3.0 * M_PI/4.0, M_PI, 5.0 * M_PI/4.0, 3.0*M_PI/2.0, 7.0 * M_PI/4.0)
     )
 
     // Test cases contain a variety of orbit sizes, eccentricities (near circular and near parabolic), inclinations (near zero and near 90), node, argP, and truA
@@ -67,6 +67,11 @@ TEST_P(StateConversionsParameterizedTest, CartesianKeplerianTest) {
     if (abs(kep.truA - 2.0*M_PI) < angleTol) {
         kep.truA = 0.0;
     }
+
+    node = MathFunctions::wrap2TwoPi(node);
+    argP = MathFunctions::wrap2TwoPi(argP);
+    truA = MathFunctions::wrap2TwoPi(truA);
+
 
     EXPECT_NEAR(sma, kep.sma, smaTol);
     EXPECT_NEAR(ecc, kep.ecc, eccTol);
@@ -109,6 +114,10 @@ TEST_P(StateConversionsParameterizedTest, EqunioctalConversionTest) {
     if (abs(kep.truA - 2.0*M_PI) < angleTol) {
         kep.truA = 0.0;
     }
+
+    node = MathFunctions::wrap2TwoPi(node);
+    argP = MathFunctions::wrap2TwoPi(argP);
+    truA = MathFunctions::wrap2TwoPi(truA);
 
     EXPECT_NEAR(sma, kep.sma, smaTol);
     EXPECT_NEAR(ecc, kep.ecc, eccTol);
