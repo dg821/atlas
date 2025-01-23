@@ -6,7 +6,7 @@
 #include <Eigen/Dense>
 #include <stdexcept>
 #include "../../math/UniversalConstants.h"
-#include "../../math/utilities/MathFunctions.h"
+#include "../../math/utilities/mathFunctions.h"
 
 namespace stateConversions {
     constexpr double mu = UniversalConstants::EarthParams::MU;

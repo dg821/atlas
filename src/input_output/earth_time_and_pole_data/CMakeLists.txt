@@ -25,4 +25,11 @@ set_target_properties(${TIME_AND_POLE_DATA_LIB_NAME} PROPERTIES
 target_include_directories(${TIME_AND_POLE_DATA_LIB_NAME}
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CURL_INCLUDE_DIRS}  # Add CURL include directories
+)
+
+# Link against CURL
+target_link_libraries(${TIME_AND_POLE_DATA_LIB_NAME}
+        PUBLIC
+        ${CURL_LIBRARIES}
 )

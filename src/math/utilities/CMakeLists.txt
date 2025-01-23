@@ -2,12 +2,12 @@ set(UTILITIES_LIB_NAME utilities_lib)
 
 set(utilities_HEADER_FILES
     RotationMatrices.h
-    MathFunctions.h
+        MathFunctions.h
 )
 
 set(utilities_SOURCE_FILES
     RotationMatrices.cpp
-    MathFunctions.cpp
+        MathFunctions.cpp
 )
 
 add_library(${UTILITIES_LIB_NAME}

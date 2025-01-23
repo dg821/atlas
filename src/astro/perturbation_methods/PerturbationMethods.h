@@ -12,8 +12,8 @@
 #include <iostream>
 #include <Eigen/Dense>
 #include <cmath>
-#include "../basic_astrodynamics/Kepler.h"
-#include "../coordinate_frames/CoordinateFrames.h"
+#include "../basic_astrodynamics/kepler.h"
+#include "../coordinate_frames/coordinateFrames.h"
 
 
 class PerturbationMethod {

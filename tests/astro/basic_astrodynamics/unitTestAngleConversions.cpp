@@ -3,7 +3,7 @@
 //
 
 #include "../../../src/astro/basic_astrodynamics/stateConversions.h"
-#include "../../../src/math/utilities/MathFunctions.h"
+#include "../../../src/math/utilities/mathFunctions.h"
 #include <iostream>
 #include <cmath>
 #include <gtest/gtest.h>

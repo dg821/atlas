@@ -6,7 +6,7 @@
 #include <cmath>
 #include <stdexcept>
 
-namespace MathFunctions {
+namespace mathFunctions {
     double sign(double x);
 
     double wrap2TwoPi(double angle);

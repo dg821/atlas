@@ -12,7 +12,7 @@ class PrecessionNutation_sData : public PrecessionNutationTable {
 public:
 
   // Polynomial coefficients for s + XY/2 (unit: microarcsecond)
-  constexpr std::array<double, 6> polynomialCoeffs = {
+  static constexpr std::array<double, 6> polynomialCoeffs = {
       94.0 * UniversalConstants::ARCSECONDS_2_RAD,
       3808.65 * UniversalConstants::ARCSECONDS_2_RAD,
       -122.68 * UniversalConstants::ARCSECONDS_2_RAD,
@@ -22,7 +22,7 @@ public:
   };
 
   // Non-polynomial part for j = 0
-  constexpr std::array<NonPolynomialTerm, 33> nonPolynomialJ0 = {{
+  static constexpr std::array<NonPolynomialTerm, 33> nonPolynomialJ0 = {{
       {-2640.73, 0.39, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
       {-63.53, 0.02, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0},
       {-11.75, -0.01, 0, 0, 2, -2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -59,14 +59,14 @@ public:
   }};
 
   // Non-polynomial part for j = 1
-  constexpr std::array<NonPolynomialTerm, 3> nonPolynomialJ1 = {{
+  static constexpr std::array<NonPolynomialTerm, 3> nonPolynomialJ1 = {{
       {-0.07, 3.57, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0},
       {1.73, -0.03, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
       {0.00, 0.48, 0, 0, 2, -2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0}
   }};
 
   // Non-polynomial part for j = 2
-  constexpr std::array<NonPolynomialTerm, 25> nonPolynomialJ2 = {{
+  static constexpr std::array<NonPolynomialTerm, 25> nonPolynomialJ2 = {{
       {743.52, -0.17, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
       {56.91, 0.06, 0, 0, 2, -2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0},
       {9.84, -0.01, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -95,7 +95,7 @@ public:
   }};
 
   // Non-polynomial part for j = 3
-  constexpr std::array<NonPolynomialTerm, 4> nonPolynomialJ3 = {{
+  static constexpr std::array<NonPolynomialTerm, 4> nonPolynomialJ3 = {{
       {0.30, -23.42, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
       {-0.03, -1.46, 0, 0, 2, -2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0},
       {-0.01, -0.25, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -103,10 +103,10 @@ public:
   }};
 
   // Non-polynomial part for j = 4
-  constexpr std::array<NonPolynomialTerm, 1> nonPolynomialJ4 = {{
+  static constexpr std::array<NonPolynomialTerm, 1> nonPolynomialJ4 = {{
     {-0.26, -0.01, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}
   }};
 
-  auto nonPolynomialCoeffs = std::make_tuple(nonPolynomialJ0, nonPolynomialJ1, nonPolynomialJ2, nonPolynomialJ3, nonPolynomialJ4);
+  // auto nonPolynomialCoeffs = std::make_tuple(nonPolynomialJ0, nonPolynomialJ1, nonPolynomialJ2, nonPolynomialJ3, nonPolynomialJ4);
 
 };

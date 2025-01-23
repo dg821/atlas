@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include <array>
-#include "../time_systems/TimeConversions.h"
+#include "../time_systems/timeConversions.h"
 #include "../../math/UniversalConstants.h"
 #include <Eigen/Dense>
 

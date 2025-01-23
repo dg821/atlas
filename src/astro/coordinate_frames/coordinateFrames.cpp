@@ -2,13 +2,13 @@
 // Created by Douglas Garza on 9/23/24.
 //
 
-#include "CoordinateFrames.h"
+#include "coordinateFrames.h"
 
 #include "astro/basic_astrodynamics/stateConversions.h"
 
 // Earth-Centered ECI to Sat-Centered RSW
-namespace CoordinateFrames {
-    Eigen::Matrix3d CoordinateFrames::eci2rsw(Eigen::Vector3d& r_eci, Eigen::Vector3d& v_eci) {
+namespace coordinateFrames {
+    Eigen::Matrix3d eci2rsw(Eigen::Vector3d& r_eci, Eigen::Vector3d& v_eci) {
 
         if (r_eci.cols() > 1) {
             r_eci.transpose();
@@ -30,7 +30,7 @@ namespace CoordinateFrames {
     }
 
     // ECI to Perifocal frame
-    Eigen::Matrix3d CoordinateFrames::eci2pqw(Eigen::Vector3d& r_eci, Eigen::Vector3d& v_eci) {
+    Eigen::Matrix3d eci2pqw(Eigen::Vector3d& r_eci, Eigen::Vector3d& v_eci) {
 
         if (r_eci.cols() > 1) {
             r_eci.transpose();
@@ -55,7 +55,7 @@ namespace CoordinateFrames {
         return dcm_eci2pqw;
     }
 
-    Eigen::Matrix3d CoordinateFrames::eci2ntw(Eigen::Vector3d& r_eci, Eigen::Vector3d& v_eci) {
+    Eigen::Matrix3d eci2ntw(Eigen::Vector3d& r_eci, Eigen::Vector3d& v_eci) {
         if (r_eci.cols() > 1) {
             r_eci.transpose();
         }
@@ -76,7 +76,7 @@ namespace CoordinateFrames {
     }
 
     // E
-    Eigen::Matrix3d eci2eqw(Eigen::Vector3d& r_eci, Eigen::Vector3d& v_eci, double mu = UniversalConstants::EarthParams::MU) {
+    Eigen::Matrix3d eci2eqw(Eigen::Vector3d& r_eci, Eigen::Vector3d& v_eci, double mu) {
         stateConversions::KeplerianElements kep = stateConversions::Cart2Kep(r_eci, v_eci, mu);
         Eigen::Matrix3d dcm_eci2eqw = RotationMatrices::rotZ(kep.node) * RotationMatrices::rotX(kep.inc) * RotationMatrices::rotZ(kep.node);
 
@@ -84,7 +84,7 @@ namespace CoordinateFrames {
     }
 
     // ECEF to topocentric SEZ
-    Eigen::Matrix3d CoordinateFrames::ecf2sez(Eigen::Vector3d rSiteVector) {
+    Eigen::Matrix3d ecf2sez(Eigen::Vector3d rSiteVector) {
         Eigen::Vector3d kHat = {0, 0, 1};
 
         Eigen::Vector3d zHat = rSiteVector / rSiteVector.norm();

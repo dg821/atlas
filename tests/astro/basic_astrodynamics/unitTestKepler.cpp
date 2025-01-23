@@ -3,9 +3,9 @@
 //
 
 #include "../../../src/astro/basic_astrodynamics/stateConversions.h"
-#include "../../../src/math/utilities/MathFunctions.h"
+#include "../../../src/math/utilities/mathFunctions.h"
 #include "../../../src/math/UniversalConstants.h"
-#include "../../../src/astro/basic_astrodynamics/Kepler.h"
+#include "../../../src/astro/basic_astrodynamics/kepler.h"
 #include <iostream>
 #include <cmath>
 #include <gtest/gtest.h>
@@ -56,7 +56,7 @@ TEST_P(KeplerProblemParameterizedTest, ReturnAfterFullPeriodTest) {
 
     double per = 2 * M_PI * std::sqrt(sma * sma * sma / mu);
 
-    auto res = Kepler::solveKepler(r, v, per);
+    auto res = kepler::solveKepler(r, v, per);
 
     Eigen::Vector3d rOut = res.first;
     Eigen::Vector3d vOut = res.second;

@@ -2,9 +2,9 @@
 // Created by Douglas Garza on 9/15/24.
 //
 
-#include "Kepler.h"
+#include "kepler.h"
 
-namespace Kepler {
+namespace kepler {
     std::pair<Eigen::Vector3d, Eigen::Vector3d> solveKepler(const Eigen::Vector3d& r0, const Eigen::Vector3d& v0, const double dt, const double mu) {
         constexpr int maxIter = 50;             // maximum number of iterations
 
