@@ -2,9 +2,9 @@
 // Created by Douglas Garza on 10/3/24.
 //
 
-#include "MathFunctions.h"
+#include "mathFunctions.h"
 
-namespace MathFunctions {
+namespace mathFunctions {
     double sign(double x) {
         if (x > 0.0) {
             return 1.0;

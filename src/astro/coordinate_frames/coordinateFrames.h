@@ -5,16 +5,16 @@
 #pragma once
 #include <Eigen/Dense>
 #include <../../math/utilities/RotationMatrices.h>
-#include <../geodetic_model/GeodeticModel.h>
+#include <../geodetic_model/geodeticModel.h>
 #include <../../math/UniversalConstants.h>
 
-namespace CoordinateFrames {
+namespace coordinateFrames {
 
     // Satellite frame conversions
     Eigen::Matrix3d eci2rsw(Eigen::Vector3d& r_eci, Eigen::Vector3d& v_eci);
     Eigen::Matrix3d eci2pqw(Eigen::Vector3d& r_eci, Eigen::Vector3d& v_eci);
     Eigen::Matrix3d eci2ntw(Eigen::Vector3d& r_eci, Eigen::Vector3d& v_eci);
-    Eigen::Matrix3d eci2eqw(Eigen::Vector3d& r_eci, Eigen::Vector3d& v_eci, double mu);
+    Eigen::Matrix3d eci2eqw(Eigen::Vector3d& r_eci, Eigen::Vector3d& v_eci, double mu = UniversalConstants::EarthParams::MU);
     Eigen::Matrix3d pqw2rsw(double truA);
 
     // terrestrial frame conversions

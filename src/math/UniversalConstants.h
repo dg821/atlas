@@ -23,9 +23,7 @@ namespace UniversalConstants {
     // Time constants
     constexpr int SECONDS_PER_MINUTE = 60;
     constexpr int SECONDS_PER_HOUR = 60;
-    constexpr double UTC_2_TAI = 37.000000;
     constexpr double TAI_2_TT = 32.184;
-    constexpr double UTC_2_GPS = UTC_2_TAI - 19.000000;
 
     // Earth-specific constants
     namespace EarthParams {

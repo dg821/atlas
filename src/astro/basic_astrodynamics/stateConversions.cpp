@@ -9,16 +9,16 @@
 
 // eccentric anomaly to mean anomaly
 namespace stateConversions {
-    double stateConversions::eccA2MeanA(double eccA, double ecc) {
+    double eccA2MeanA(double eccA, double ecc) {
         double meanA = eccA - ecc * sin(eccA);
 
         return meanA;
     }
 
     // mean anomaly to eccentric anomaly
-    double stateConversions::meanA2EccA(double meanA, double ecc) {
+    double meanA2EccA(double meanA, double ecc) {
 
-        meanA = MathFunctions::wrap2TwoPi(meanA);           // normalize between [0, 2pi]
+        meanA = mathFunctions::wrap2TwoPi(meanA);           // normalize between [0, 2pi]
         double tol = 1e-12;                  // set tolerance
 
         double EccA;
@@ -43,23 +43,23 @@ namespace stateConversions {
     }
 
     // true anomaly to eccentric anomaly
-    double stateConversions::truA2EccA(double truA, double ecc) {
+    double truA2EccA(double truA, double ecc) {
 
         double sinEcc = std::sin(truA) * std::sqrt(1.0 - ecc * ecc) / (1.0 + ecc * std::cos(truA));
         double cosEcc = (ecc + std::cos(truA)) / (1.0 + ecc * std::cos(truA));
 
         double EccA = std::atan2(sinEcc, cosEcc);
 
-        return MathFunctions::wrap2TwoPi(EccA);
+        return mathFunctions::wrap2TwoPi(EccA);
     }
 
     // eccentric anomaly to true anomaly
-    double stateConversions::EccA2truA(double EccA, double ecc) {
+    double EccA2truA(double EccA, double ecc) {
 
         double beta = ecc / (1 + std::sqrt(1 - ecc * ecc));
         double truA = EccA + 2.0 * std::atan2(beta * std::sin(EccA), 1.0 - beta * std::cos(EccA));
 
-        return MathFunctions::wrap2TwoPi(truA);
+        return mathFunctions::wrap2TwoPi(truA);
     }
 
     // cartesian state to keplerian elements
@@ -72,27 +72,27 @@ namespace stateConversions {
         kep.n_vec = Eigen::Vector3d(0, 0, 1).cross(kep.h_vec);      // nodes vector
 
         if (r.dot(v) > 0) {                             // true anomaly
-            kep.truA = MathFunctions::stableArcCos(r.dot(kep.ecc_vec) / (r.norm() * kep.ecc_vec.norm()));
+            kep.truA = mathFunctions::stableArcCos(r.dot(kep.ecc_vec) / (r.norm() * kep.ecc_vec.norm()));
         } else {
-            kep.truA = -MathFunctions::stableArcCos(r.dot(kep.ecc_vec) / (r.norm() * kep.ecc_vec.norm()));
+            kep.truA = -mathFunctions::stableArcCos(r.dot(kep.ecc_vec) / (r.norm() * kep.ecc_vec.norm()));
         }
-        kep.truA = MathFunctions::wrap2TwoPi(kep.truA);     // domain [0, 2pi)
+        kep.truA = mathFunctions::wrap2TwoPi(kep.truA);     // domain [0, 2pi)
 
         kep.inc = std::acos(kep.h_vec(2) / kep.h_vec.norm());                   // inclination
 
         if (kep.n_vec.dot(Eigen::Vector3d(0, 1, 0)) > 0) {                  // RAAN
-            kep.node = MathFunctions::stableArcCos(kep.n_vec.dot(Eigen::Vector3d(1, 0, 0)) / kep.n_vec.norm());
+            kep.node = mathFunctions::stableArcCos(kep.n_vec.dot(Eigen::Vector3d(1, 0, 0)) / kep.n_vec.norm());
         } else {
-            kep.node = -MathFunctions::stableArcCos(kep.n_vec.dot(Eigen::Vector3d(1, 0, 0)) / kep.n_vec.norm());
+            kep.node = -mathFunctions::stableArcCos(kep.n_vec.dot(Eigen::Vector3d(1, 0, 0)) / kep.n_vec.norm());
         }
-        kep.node = MathFunctions::wrap2TwoPi(kep.node);         // domain [0, 2pi)
+        kep.node = mathFunctions::wrap2TwoPi(kep.node);         // domain [0, 2pi)
 
         if (kep.ecc_vec.dot(Eigen::Vector3d(0,0,1)) > 0) {              // eccentricity vector points to perigee. find argument of perigee
-            kep.argP = MathFunctions::stableArcCos(kep.n_vec.dot(kep.ecc_vec) / (kep.n_vec.norm() * kep.ecc_vec.norm()));
+            kep.argP = mathFunctions::stableArcCos(kep.n_vec.dot(kep.ecc_vec) / (kep.n_vec.norm() * kep.ecc_vec.norm()));
         } else {
-            kep.argP = -MathFunctions::stableArcCos(kep.n_vec.dot(kep.ecc_vec) / (kep.n_vec.norm() * kep.ecc_vec.norm()));
+            kep.argP = -mathFunctions::stableArcCos(kep.n_vec.dot(kep.ecc_vec) / (kep.n_vec.norm() * kep.ecc_vec.norm()));
         }
-        kep.argP = MathFunctions::wrap2TwoPi(kep.argP);         // domain [0, 2pi)
+        kep.argP = mathFunctions::wrap2TwoPi(kep.argP);         // domain [0, 2pi)
 
         kep.specE = v.squaredNorm() / 2 - mu / r.norm();                // specific orbital energy (conserved quantity)
         kep.sma = -mu / (2 * kep.specE);                                // semi-major axis
@@ -155,9 +155,9 @@ namespace stateConversions {
         double eccAnom = eccLon - kep.node - kep.argP;
         kep.truA = EccA2truA(eccAnom, kep.ecc);
 
-        kep.node = MathFunctions::wrap2TwoPi(kep.node);
-        kep.argP = MathFunctions::wrap2TwoPi(kep.argP);
-        kep.truA = MathFunctions::wrap2TwoPi(kep.truA);
+        kep.node = mathFunctions::wrap2TwoPi(kep.node);
+        kep.argP = mathFunctions::wrap2TwoPi(kep.argP);
+        kep.truA = mathFunctions::wrap2TwoPi(kep.truA);
 
         return kep;
     }

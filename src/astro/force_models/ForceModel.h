@@ -9,7 +9,7 @@
 #include "../../math/UniversalConstants.h"
 #include <cmath>
 #include "../../input_output/planetary_ephemerides/meeusEphemeris.h"
-#include "../geodetic_model/GeodeticModel.h"
+#include "../geodetic_model/geodeticModel.h"
 #include <vector>
 #include <stdexcept>
 #include <fstream>

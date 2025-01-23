@@ -13,7 +13,8 @@ set(googletest_DIR "/Users/douglasgarza/googletest/googletest/cmake")
 set(Eigen3_DIR "/usr/local/include/eigen/3.4.0_1/share/eigen3/cmake")
 
 find_package(GTest REQUIRED)
-find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(CURL REQUIRED)
 
 add_subdirectory(src/math)
 add_subdirectory(src/astro)

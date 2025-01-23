@@ -73,12 +73,22 @@ public:
     return 0.02438175 * t_tt + 0.00000538691 * t_tt * t_tt;
   }
 
-  static std::vector<std::function<double(double t_tt)>> getAllFundamentalArguments(double t_tt) {
-    getMeanAnomalyMoon(t_tt), getMeanAnomalySun(t_tt), getMeanArgLatMoon(t_tt), getMeanElongationSun(t_tt), getNodeMoon(t_tt),
-    getMeanLongMercury(t_tt), getMeanLongVenus(t_tt), getMeanLongEarth(t_tt), getMeanLongMars(t_tt), getMeanLongJupiter(t_tt),
-    getMeanLongSaturn(t_tt), getMeanLongUranus(t_tt), getMeanLongNeptune(t_tt), getLongPrecession(t_tt);
+  static std::vector<std::function<double(double)>> getAllFundamentalArguments() {
+    return {
+      getMeanAnomalyMoon,
+      getMeanAnomalySun,
+      getMeanArgLatMoon,
+      getMeanElongationSun,
+      getNodeMoon,
+      getMeanLongMercury,
+      getMeanLongVenus,
+      getMeanLongEarth,
+      getMeanLongMars,
+      getMeanLongJupiter,
+      getMeanLongSaturn,
+      getMeanLongUranus,
+      getMeanLongNeptune,
+      getLongPrecession
+  };
   }
-
-
-
 };

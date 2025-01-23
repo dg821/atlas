@@ -11,13 +11,13 @@ SpaceVehicle::SpaceVehicle(const double mass_total, const double surface_area, c
 void SpaceVehicle::set_rv(const double t, Eigen::Vector3d &r, Eigen::Vector3d &v) {
 
     // Function for conversion to orbital elements
-    stateConversion::KeplerianElements kep = stateConversion::Cart2Kep(r, v);
+    stateConversions::KeplerianElements kep = stateConversions::Cart2Kep(r, v);
 
     state_ = State{t, r, v, kep.sma, kep.ecc, kep.inc, kep.node, kep.argP, kep.truA};
 }
 
 void SpaceVehicle::set_orb(double t, double sma, double ecc, double inc, double node, double argP, double truA) {
-    stateConversion::CartesianState cart = stateConversion::Kep2Cart(sma, ecc, inc, node, argP, truA);
+    stateConversions::CartesianState cart = stateConversions::Kep2Cart(sma, ecc, inc, node, argP, truA);
 
     state_ = State{t, cart.r, cart.v, sma, ecc, inc, node, argP, truA};
 

@@ -21,3 +21,10 @@ target_include_directories(${GEODETIC_MODEL_LIB_NAME}
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+target_link_libraries(${GEODETIC_MODEL_LIB_NAME}
+        PUBLIC
+        extract_time_and_pole_data_lib
+        time_conversions_lib
+        basic_astrodynamics_lib
+)

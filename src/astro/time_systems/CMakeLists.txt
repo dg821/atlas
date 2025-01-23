@@ -21,3 +21,8 @@ target_include_directories(${TIME_CONVERSIONS_LIB_NAME}
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+target_link_libraries(${TIME_CONVERSIONS_LIB_NAME}
+        PUBLIC
+        extract_time_and_pole_data_lib
+)
