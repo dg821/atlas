@@ -4,10 +4,11 @@
 
 #include "ForceModel.h"
 
-Eigen::Vector3d TwoBody::computeAcceleration(double t, const SpaceVehicle& sv) const {
+TwoBody::TwoBody() = default;
+TwoBody::~TwoBody() = default;
+
+Eigen::Vector3d TwoBody::computeAcceleration(double t, const Eigen::Vector3d& r, const Eigen::Vector3d& v, const SpaceVehicle& sv) const {
     double mu = UniversalConstants::EarthParams::MU;
-    SpaceVehicle::State state = sv.get_state().value();
-    Eigen::Vector3d r = state.r;
     Eigen::Vector3d acceleration = (-mu / std::pow(r.norm(), 3)) * r;           // Two-body gravity model
     return acceleration;
 }
@@ -16,44 +17,13 @@ std::string TwoBody::getName() const {
     return "TwoBody";
 }
 
-Eigen::Vector3d J2Force::computeAcceleration(double t, const SpaceVehicle& sv) const {
+DragExpForce::DragExpForce() = default;
+DragExpForce::~DragExpForce() = default;
 
-    double mu = UniversalConstants::EarthParams::MU;
-    double rEq = UniversalConstants::EarthParams::RADIUS_EQ;
-    double j2 = UniversalConstants::EarthParams::J2;
-
-    SpaceVehicle::State state = sv.get_state().value();
-    Eigen::Vector3d r = state.r;
-    const double r2 = r.norm() * r.norm();
-    const double r5 = r2 * r2 * r.norm();
-
-    // Calculate z squared term
-    const double z2 = r(2) * r(2);
-
-    // Calculate common factor
-    const double comFact = 1.5 * j2 * mu * (rEq * rEq) / r5;
-
-    // Calculate acceleration components of J2 gravity model
-    Eigen::Vector3d acceleration;
-    acceleration(0) = comFact * r(0) * (5.0 * z2 / r2 - 1.0);
-    acceleration(1) = comFact * r(1) * (5.0 * z2 / r2 - 1.0);
-    acceleration(2) = comFact * r(2) * (5.0 * z2 / r2 - 3.0);
-
-    return acceleration;
-}
-
-std::string J2Force::getName() const {
-    return "J2";
-}
-
-Eigen::Vector3d DragExpForce::computeAcceleration(double t, const SpaceVehicle& sv) const {
+Eigen::Vector3d DragExpForce::computeAcceleration(double t, const Eigen::Vector3d& r, const Eigen::Vector3d& v, const SpaceVehicle& sv) const {
 
     double omegaEarth = UniversalConstants::EarthParams::ROTATION_RATE;
     double rEq = UniversalConstants::EarthParams::RADIUS_EQ;
-
-    SpaceVehicle::State state = sv.get_state().value();
-    Eigen::Vector3d v = state.v;
-    Eigen::Vector3d r = state.r;
 
     double mass = sv.get_mass().value();                    // kg
     double area = sv.get_surface_area().value() * 1e-6;       // km (for unit agreement)
@@ -81,7 +51,10 @@ std::string DragExpForce::getName() const {
 }
 
 
-Eigen::Vector3d SimpleSRPForce::computeAcceleration(double t, const SpaceVehicle& sv) const {
+SimpleSRPForce::SimpleSRPForce() = default;
+SimpleSRPForce::~SimpleSRPForce() = default;
+
+Eigen::Vector3d SimpleSRPForce::computeAcceleration(double t, const Eigen::Vector3d& r, const Eigen::Vector3d& v, const SpaceVehicle& sv) const {
 
     double pSRP = 4.57e-6 * 1e3;          // N/m^2
     double reflectivity = 1.0;          // Approximated value. can vary between [0.0, 2.0]
@@ -89,7 +62,7 @@ Eigen::Vector3d SimpleSRPForce::computeAcceleration(double t, const SpaceVehicle
     double mass = sv.get_mass().value();
 
     Eigen::Vector3d rSun = MeeusVectors::getSunVec(t);                  // sun vector from Meeus
-    Eigen::Vector3d rSv2Sun = rSun - sv.get_state().value().r;
+    Eigen::Vector3d rSv2Sun = rSun - r;
 
     Eigen::Vector3d acceleration = -(pSRP * reflectivity * area / mass) * (rSv2Sun / rSv2Sun.norm());
 
@@ -100,15 +73,16 @@ std::string SimpleSRPForce::getName() const {
     return "Simple SRP";
 }
 
-Eigen::Vector3d LunisolarThirdBodyForce::computeAcceleration(double t, const SpaceVehicle& sv) const {
+LunisolarThirdBodyForce::LunisolarThirdBodyForce() = default;
+LunisolarThirdBodyForce::~LunisolarThirdBodyForce() = default;
+
+Eigen::Vector3d LunisolarThirdBodyForce::computeAcceleration(double t, const Eigen::Vector3d& r, const Eigen::Vector3d& v, const SpaceVehicle& sv) const {
 
     Eigen::Vector3d rSun = MeeusVectors::getSunVec(t);          // sun vector from Meeus
     Eigen::Vector3d rMoon = MeeusVectors::getMoonVec(t);        // moon vector from Meeus
 
     double muSun = UniversalConstants::SunParams::MU;
     double muMoon = UniversalConstants::MoonParams::MU;
-
-    Eigen::Vector3d r = sv.get_state().value().r;                   // sv state
 
     Eigen::Vector3d rSv2Sun = rSun - r;                     // sv to sun
     Eigen::Vector3d rSv2Moon = rMoon - r;                   // sv to moon
@@ -131,12 +105,13 @@ std::string LunisolarThirdBodyForce::getName() const {
 }
 
 
+NonSphericalGravity::~NonSphericalGravity() = default;
 
 void NonSphericalGravity::initializeCoefficients() {
     // Initialize arrays with zeros
-    Cnm = std::vector<std::vector<double>>(degree_n + 1,
+    Clm = std::vector<std::vector<double>>(degree_l + 1,
         std::vector<double>(order_m + 1, 0.0));
-    Snm = std::vector<std::vector<double>>(degree_n + 1,
+    Slm = std::vector<std::vector<double>>(degree_l + 1,
         std::vector<double>(order_m + 1, 0.0));
 
     if (!loadCoefficientsFromFile()) {
@@ -152,7 +127,7 @@ bool NonSphericalGravity::loadCoefficientsFromFile() {
     }
 
     std::string line;
-    // Skip header
+    // skip header
     std::getline(file, line);
 
     while (std::getline(file, line)) {
@@ -165,169 +140,218 @@ bool NonSphericalGravity::loadCoefficientsFromFile() {
             row.push_back(std::stod(value));
         }
 
-        if (row.size() != 4) {  // n, m, C, S
+        if (row.size() != 4) {  // l, m, C, S
             continue;
         }
 
-        int n = static_cast<int>(row[0]);
+        int l = static_cast<int>(row[0]);
         int m = static_cast<int>(row[1]);
 
         // Only store coefficients up to our maximum order
-        if (n <= degree_n && m <= order_m) {
-            Cnm[n][m] = row[2];
-            Snm[n][m] = row[3];
+        if (l <= degree_l && m <= order_m) {
+            Clm[l][m] = row[2];
+            Slm[l][m] = row[3];
         }
     }
 
     return true;
 }
 
+double NonSphericalGravity::normalizeLegendreFunction(double Plm, double l, double m, double k) const {
 
-auto NonSphericalGravity::computeLegendrePolynomials(double phi) const ->
-    std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> {
+    double Plm_normalized = std::sqrt((2.0 - k) * (2.0*l + 1.0) *
+        (mathFunctions::factorial(l - m) / mathFunctions::factorial(l + m))) * Plm;
 
-    std::vector<std::vector<double>> Pnm(degree_n + 1,
-        std::vector<double>(order_m + 1, 0.0));
-    std::vector<std::vector<double>> dPnm(degree_n + 1,
-        std::vector<double>(order_m + 1, 0.0));
+    return Plm_normalized;
+}
+
+std::vector<std::vector<double>> NonSphericalGravity::computeLegendrePolynomials(double phi) const {
+    // returns normalized legendre functions
+
+    std::vector<std::vector<double>> Plm(degree_l + 1,
+        std::vector<double>(degree_l + 1, 0.0));
 
     double sin_phi = std::sin(phi);
     double cos_phi = std::cos(phi);
-    double tan_phi = sin_phi/cos_phi;
+    double sin_phi_squared = sin_phi * sin_phi;
 
-    // seed values (n=0, m=0)
-    Pnm[0][0] = 1.0;
-    dPnm[0][0] = 0.0;
+    int l_idx = degree_l;
+    int m_idx;
+    double l;
+    double m;
+    double k;
+    while (l_idx >= 0) {
+        l = static_cast<double>(l_idx);
+        double P_l_l_temp = mathFunctions::factorial(2.0 * l - 1.0) / (std::pow(2.0, l-1.0) *
+            mathFunctions::factorial(l-1.0)) *
+                std::pow(1.0 - sin_phi_squared, l/2.0);
 
-    // Compute P(1,0) and P(1,1) as base cases
-    if (degree_n >= 1) {
-        Pnm[1][0] = sqrt(3.0) * sin_phi;
-        dPnm[1][0] = sqrt(3.0) * cos_phi;
+        double P_l_lminus1_temp = sin_phi / std::sqrt(1.0 - sin_phi_squared) * P_l_l_temp;
 
-        if (order_m >= 1) {
-            Pnm[1][1] = sqrt(3.0) * cos_phi;
-            dPnm[1][1] = -sqrt(3.0) * sin_phi;
+        m_idx = l_idx;
+        while (m_idx >= 0) {
+            m = static_cast<double>(m_idx);
+            if (m_idx == l_idx) {
+                // if this loop just started
+                if (m_idx > 0) {
+                    k = 0.0;
+                } else {
+                    k = 1.0;
+                }
+                Plm[l_idx][l_idx] = normalizeLegendreFunction(P_l_l_temp, l, m, k);
+                Plm[l_idx][l_idx-1] = normalizeLegendreFunction(P_l_lminus1_temp, l, m, k);
+
+                m_idx -= 2;
+
+            } else {
+
+                double P_star_lm = 2.0 * (m + 1.0) * std::sqrt(1.0 / ((l + m + 1.0)*(l - m))) *
+                    (sin_phi / std::sqrt(1.0 - sin_phi_squared)) * Plm[l_idx][m_idx + 1] -
+                        std::sqrt((l + m + 2.0)*(l - m - 1.0)/((l + m + 1.0)*(l - m))) * Plm[l_idx][m_idx+2];
+
+                if (m_idx > 0) {
+                    Plm[l_idx][m_idx] = P_star_lm;
+                } else {
+                    Plm[l_idx][m_idx] = (1 / std::sqrt(2)) * P_star_lm;
+                }
+
+                m_idx--;
+            }
+
         }
+
+        l_idx--;
     }
 
-    // compute polynomials using recursion relations
-    for (int n = 2; n <= degree_n; n++) {
-        // Compute P(n,0)
-        double k = sqrt((2*n-1)/(2*n));
-        Pnm[n][0] = k * sin_phi * Pnm[n-1][0];
-        dPnm[n][0] = n * sin_phi * Pnm[n][0] - sqrt(n*(n+1)) * cos_phi * Pnm[n-1][0];
-
-        // Compute P(n,m) and dP(n,m)
-        for (int m = 1; m <= n && m <= order_m; m++) {
-            if (n == m) {
-                Pnm[n][m] = cos_phi * sqrt((2*n+1)/(2*n)) * Pnm[n-1][n-1];
-                dPnm[n][m] = -n * tan_phi * Pnm[n][m];
-            }
-            else {
-                double k1 = sqrt((2*n+1)/((2*n-1)*(n+m)*(n-m)));
-                double k2 = sqrt((2*n+1)*(n+m-1)*(n-m-1)/((2*n-3)*(n+m)*(n-m)));
-                Pnm[n][m] = k1 * sin_phi * Pnm[n-1][m] - k2 * Pnm[n-2][m];
-                dPnm[n][m] = n * sin_phi * Pnm[n][m] - sqrt((n+m)*(n-m+1)) * cos_phi * Pnm[n][m-1];
-            }
-        }
-    }
-
-    return {Pnm, dPnm};
+    return Plm;
 }
 
-NonSphericalGravity::NonSphericalGravity(int n, int m, const std::string& coeff_path)
-    : degree_n(std::min(n, MAX_ORDER)),
-      order_m(m == -1 ? degree_n : std::min(m, MAX_ORDER)),
+
+NonSphericalGravity::NonSphericalGravity(int l, int m, const std::string& coeff_path)
+    : degree_l(std::min(l, MAX_DEGREE)),
+      order_m(m == -1 ? degree_l : std::min(m, MAX_ORDER)),
       coefficients_path(coeff_path) {
 
-    if (n < 2 || (m != -1 && (m < 0 || m > n))) {
+    if (l < 2 || (m != -1 && (m < 0 || m > l))) {
         throw std::invalid_argument("Invalid gravity model orders");
     }
     initializeCoefficients();
 }
 
-Eigen::Vector3d NonSphericalGravity::computeAcceleration(double t, const SpaceVehicle& sv) const {
+void NonSphericalGravity::setDegreeOrder(int l, int m) {
+    if (l < 2 || m < 0 || m > l || l > MAX_DEGREE || m > MAX_ORDER) {
+        throw std::invalid_argument("Invalid gravity model orders");
+    }
+    degree_l = l;
+    order_m = m;
+    initializeCoefficients();
+}
+
+std::string NonSphericalGravity::getName() const {
+    return "NonSphericalGravity";
+}
+
+Eigen::Vector3d NonSphericalGravity::computeAcceleration(double t, const Eigen::Vector3d& r, const Eigen::Vector3d& v, const SpaceVehicle& sv) const {
     double rEq = UniversalConstants::EarthParams::RADIUS_EQ;
     double mu = UniversalConstants::EarthParams::MU;
 
-    // get position in ECI frame
-    Eigen::Vector3d r_eci = sv.get_state().value().r;
-    Eigen::Vector3d v_eci = sv.get_state().value().v;
-
     // transform from ECI to ECEF
-    auto [r_ecef, v_ecef] = geodeticModel::eci2ecef(r_eci, v_eci, t);
+    auto [r_ecef, v_ecef] = geodeticModel::eci2ecef(r, v, t);
 
     double x = r_ecef[0];
     double y = r_ecef[1];
     double z = r_ecef[2];
 
-    double r = r_ecef.norm();
-    double phi = std::asin(z/r);      // latitude
+    double rMag = r_ecef.norm();
+    double phi = std::asin(z/rMag);      // latitude
     double lambda = std::atan2(y, x);  // longitude
 
+    double sinPhi = std::sin(phi);
+    double cosPhi = std::cos(phi);
+    double tanPhi = sinPhi / cosPhi;
+
     // compute Legendre polynomials and derivatives
-    auto [Pnm, dPnm] = computeLegendrePolynomials(phi);
+    auto Plm = computeLegendrePolynomials(phi);
+    auto Plm_minus = computeLegendrePolynomials(phi - numDiffTol);
+    auto Plm_plus = computeLegendrePolynomials(phi + numDiffTol);
+
 
     // initialize acceleration components (spherical coordinates)
-    double ar = 0.0;    // radial
-    double aphi = 0.0;  // latitudinal
-    double alam = 0.0;  // longitudinal
+    Eigen::Vector3d a_ecef;
 
-    for (int n = 2; n <= degree_n; n++) {  // Start from n=2 as n=0,1 terms are not used
-        double r_ratio = rEq/r;
-        double r_ratio_n = std::pow(r_ratio, n);
+    double dU_dr = 0.0;
+    double dU_dphi = 0.0;
+    double dU_dlambda = 0.0;
 
-        for (int m = 0; m <= n && m <= order_m; m++) {
+    double l;
+    double m;
+    for (int l_idx = 2; l_idx <= degree_l; l_idx++) {
+        l = static_cast<double>(l_idx);
+        double r_ratio = rEq/rMag;
+        double r_ratio_l = std::pow(r_ratio, l_idx);
+
+        for (int m_idx = 0; m_idx <= l_idx && m_idx <= order_m; m_idx++) {
+            m = static_cast<double>(m_idx);
             double cos_m_lambda = std::cos(m * lambda);
             double sin_m_lambda = std::sin(m * lambda);
 
-            // radial component
-            ar += (n+1) * r_ratio_n * Pnm[n][m] *
-                 (Cnm[n][m] * cos_m_lambda + Snm[n][m] * sin_m_lambda);
+            double Plm_deriv = (Plm_plus[l_idx][m_idx] - Plm_minus[l_idx][m_idx]) / (2 * numDiffTol);
 
-            // latitudinal component
-            aphi += r_ratio_n * dPnm[n][m] *
-                   (Cnm[n][m] * cos_m_lambda + Snm[n][m] * sin_m_lambda);
+            dU_dr += Plm[l_idx][m_idx] *
+                (Clm[l_idx][m_idx] * cos_m_lambda + Slm[l_idx][m_idx] * sin_m_lambda);
 
-            // longitudinal component
-            if (m > 0) {
-                alam += m * r_ratio_n * Pnm[n][m] *
-                       (Snm[n][m] * cos_m_lambda - Cnm[n][m] * sin_m_lambda);
-            }
+            dU_dphi += Plm_deriv * (Clm[l_idx][m_idx] * cos_m_lambda + Slm[l_idx][m_idx] * sin_m_lambda);
+
+            dU_dlambda += m * Plm[l_idx][m_idx] * (-Clm[l_idx][m_idx] * sin_m_lambda + Slm[l_idx][m_idx] * cos_m_lambda);
+
         }
+
+        dU_dr *= (l + 1.0) * r_ratio_l;
+        dU_dphi *= r_ratio_l;
+        dU_dlambda *= r_ratio_l;
     }
 
-    // Scale components
-    ar *= -mu/(r*r);
-    aphi *= -mu/(r*r);
-    alam *= -mu/(r*r);
+    // Scale the derivatives and convert to acceleration
+    dU_dr *= -mu/(rMag*rMag);
+    dU_dphi *= mu/(rMag*rMag);
+    dU_dlambda *= mu/(rMag*rMag);
 
-    // convert from spherical to ECEF
+    Eigen::Vector3d a_sph = {dU_dr, dU_dphi, dU_dlambda};
+    Eigen::Matrix3d sph2car;
+
+    // Precompute trigonometric values
     double cos_phi = std::cos(phi);
     double sin_phi = std::sin(phi);
     double cos_lambda = std::cos(lambda);
     double sin_lambda = std::sin(lambda);
 
-    // compute acceleration in ECEF
-    Eigen::Vector3d a_ecef;
-    a_ecef[0] = (ar * cos_phi * cos_lambda -
-                     aphi * sin_phi * cos_lambda -
-                     alam * sin_lambda);
-    a_ecef[1] = (ar * cos_phi * sin_lambda -
-                     aphi * sin_phi * sin_lambda +
-                     alam * cos_lambda);
-    a_ecef[2] = ar * sin_phi + aphi * cos_phi;
+    sph2car(0, 0) = cos_phi * cos_lambda;
+    sph2car(0, 1) = -sin_phi * cos_lambda;
+    sph2car(0, 2) = -sin_lambda;
+
+    sph2car(1, 0) = cos_phi * sin_lambda;
+    sph2car(1, 1) = -sin_phi * sin_lambda;
+    sph2car(1, 2) = cos_lambda;
+
+    sph2car(2, 0) = sin_phi;
+    sph2car(2, 1) = cos_phi;
+    sph2car(2, 2) = 0.0;
+
+    a_ecef = sph2car * a_sph;
 
     // transform acceleration back to ECI frame
     auto [r_eci_out, v_eci_out, a_eci_out] = geodeticModel::ecef2eci(r_ecef, v_ecef, a_ecef, t);
+
     return a_eci_out;
 }
 
-void NonSphericalGravity::setDegreeOrder(int n, int m) {
-    if (n < 2 || m < 0 || m > n || n > MAX_ORDER || m > MAX_ORDER) {
-        throw std::invalid_argument("Invalid gravity model orders");
-    }
-    degree_n = n;
-    order_m = m;
-    initializeCoefficients();
+
+
+//J2
+Eigen::Vector3d J2::computeAcceleration(double t, const Eigen::Vector3d& r, const Eigen::Vector3d& v, const SpaceVehicle& sv) const {
+    return nsg.computeAcceleration(t, r, v, sv);
+}
+
+std::string J2::getName() const {
+    return "J2";
 }

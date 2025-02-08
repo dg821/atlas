@@ -28,4 +28,11 @@ namespace mathFunctions {
         if (x >= 1.0) return 0.0;
         return std::acos(x);
     }
+
+    double factorial(const int x) {
+        double f = 1.0;
+        for (int i=1; i<=x; ++i)
+            f *= i;
+        return f;
+    }
 }

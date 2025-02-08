@@ -20,9 +20,9 @@ private:
         double sin_eps = std::sin(eps);
 
         return Eigen::Vector3d(
-            v_ecl.x,
-            v_ecl.y * cos_eps - v_ecl.z * sin_eps,
-            v_ecl.y * sin_eps + v_ecl.z * cos_eps
+            v_ecl(0),
+            v_ecl(1) * cos_eps - v_ecl(2) * sin_eps,
+            v_ecl(1) * sin_eps + v_ecl(2) * cos_eps
         );
     }
 public:
