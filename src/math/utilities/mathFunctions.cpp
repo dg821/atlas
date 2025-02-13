@@ -29,10 +29,16 @@ namespace mathFunctions {
         return std::acos(x);
     }
 
-    double factorial(const int x) {
-        double f = 1.0;
-        for (int i=1; i<=x; ++i)
-            f *= i;
-        return f;
+    double factorial(int n) {
+        if (n < 0) {
+            throw std::invalid_argument("Factorial not defined for negative numbers");
+        }
+        if (n == 0) return 1.0;
+
+        double result = 1.0;
+        for (int i = 1; i <= n; i++) {
+            result *= i;
+        }
+        return result;
     }
 }

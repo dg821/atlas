@@ -300,68 +300,69 @@ namespace geodeticModel {
     }
 
 
-    std::tuple<Eigen::Vector3d, Eigen::Vector3d, Eigen::Vector3d> ecef2eci(Eigen::Vector3d& r_ecef, Eigen::Vector3d& v_ecef, Eigen::Vector3d& a_ecef, double timej2k) {
-        // Get rotation matrices
-        Eigen::Matrix3d dcm_itrf2tirs = getDCM_itrf2tirs(timej2k);
-        Eigen::Matrix3d dcm_tirs2cirs = getDCM_tirs2cirs(timej2k);
-        Eigen::Matrix3d dcm_cirs2gcrf = getDCM_cirs2gcrf_lofi(timej2k);
-
-        // Full rotation matrix from ECEF to ECI
-        Eigen::Matrix3d dcm_full = dcm_cirs2gcrf * dcm_tirs2cirs * dcm_itrf2tirs;
-
-        std::cout << "Input a_ecef: " << a_ecef.transpose() << std::endl;
-
-        // Transform vectors to ECI
-        Eigen::Vector3d r_eci = dcm_full * r_ecef;
-        Eigen::Vector3d v_eci = dcm_full * v_ecef;
-        Eigen::Vector3d a_direct_eci = dcm_full * a_ecef;
-
-        std::cout << "r_eci: " << r_eci.transpose() << std::endl;
-        std::cout << "v_eci: " << v_eci.transpose() << std::endl;
-        std::cout << "a_direct_eci: " << a_direct_eci.transpose() << std::endl;
-
-        // Transform Earth rotation vector to ECI
-        Eigen::Vector3d earthRotationVector = {0.0, 0.0, UniversalConstants::EarthParams::ROTATION_RATE};
-        Eigen::Vector3d earthRotationVector_eci = dcm_full * earthRotationVector;
-
-        std::cout << "earthRotationVector_eci: " << earthRotationVector_eci.transpose() << std::endl;
-
-        // Compute frame effects in ECI
-        Eigen::Vector3d cross_product = earthRotationVector_eci.cross(v_eci);
-        std::cout << "Cross product before *2: " << cross_product.transpose() << std::endl;
-        Eigen::Vector3d coriolis_eci = 2 * earthRotationVector_eci.cross(v_eci);
-        Eigen::Vector3d centripetal_eci = earthRotationVector_eci.cross(earthRotationVector_eci.cross(r_eci));
-
-        std::cout << "coriolis_eci: " << coriolis_eci.transpose() << std::endl;
-        std::cout << "centripetal_eci: " << centripetal_eci.transpose() << std::endl;
-
-        // Sum all acceleration terms in ECI
-        Eigen::Vector3d a_eci = a_direct_eci + coriolis_eci + centripetal_eci;
-
-        std::cout << "Final a_eci: " << a_eci.transpose() << std::endl;
-        std::cout << "-------------------" << std::endl;
-
-        return std::make_tuple(r_eci, v_eci, a_eci);
-    }
     // std::tuple<Eigen::Vector3d, Eigen::Vector3d, Eigen::Vector3d> ecef2eci(Eigen::Vector3d& r_ecef, Eigen::Vector3d& v_ecef, Eigen::Vector3d& a_ecef, double timej2k) {
-    //     // IAU-2000 CIO-Based (ITRF to GCRF)
-    //
-    //     Eigen::Matrix3d dcm_itrf2gcrf = getDCM_itrf2gcrf(timej2k);
-    //     Eigen::Vector3d r_eci = dcm_itrf2gcrf * r_ecef;
-    //
+    //     // Get rotation matrices
     //     Eigen::Matrix3d dcm_itrf2tirs = getDCM_itrf2tirs(timej2k);
     //     Eigen::Matrix3d dcm_tirs2cirs = getDCM_tirs2cirs(timej2k);
     //     Eigen::Matrix3d dcm_cirs2gcrf = getDCM_cirs2gcrf_lofi(timej2k);
     //
-    //     Eigen::Vector3d r_tirs = dcm_itrf2tirs * r_ecef;
-    //     Eigen::Vector3d v_tirs = dcm_itrf2tirs * v_ecef;        // omega_polar is neglected here (assumed to be small)
+    //     // Full rotation matrix from ECEF to ECI
+    //     Eigen::Matrix3d dcm_full = dcm_cirs2gcrf * dcm_tirs2cirs * dcm_itrf2tirs;
     //
+    //     std::cout << "Input a_ecef: " << a_ecef.transpose() << std::endl;
+    //
+    //     // Transform vectors to ECI
+    //     Eigen::Vector3d r_eci = dcm_full * r_ecef;
+    //     Eigen::Vector3d v_eci = dcm_full * v_ecef;
+    //     Eigen::Vector3d a_direct_eci = dcm_full * a_ecef;
+    //
+    //     std::cout << "r_eci: " << r_eci.transpose() << std::endl;
+    //     std::cout << "v_eci: " << v_eci.transpose() << std::endl;
+    //     std::cout << "a_direct_eci: " << a_direct_eci.transpose() << std::endl;
+    //
+    //     // Transform Earth rotation vector to ECI
     //     Eigen::Vector3d earthRotationVector = {0.0, 0.0, UniversalConstants::EarthParams::ROTATION_RATE};
+    //     Eigen::Vector3d earthRotationVector_eci = dcm_full * earthRotationVector;
     //
-    //     Eigen::Vector3d v_eci = dcm_cirs2gcrf * dcm_tirs2cirs * (dcm_itrf2tirs * v_ecef + earthRotationVector.cross(r_tirs));
+    //     std::cout << "earthRotationVector_eci: " << earthRotationVector_eci.transpose() << std::endl;
     //
-    //     Eigen::Vector3d a_eci = dcm_cirs2gcrf * dcm_tirs2cirs * (dcm_itrf2tirs * a_ecef + 2 * earthRotationVector.cross(v_tirs) + earthRotationVector.cross(earthRotationVector.cross(r_tirs)));      // omegaDot term is neglected
+    //     // Compute frame effects in ECI
+    //     Eigen::Vector3d cross_product = earthRotationVector_eci.cross(v_eci);
+    //     std::cout << "Cross product before *2: " << cross_product.transpose() << std::endl;
+    //     Eigen::Vector3d coriolis_eci = 2 * earthRotationVector_eci.cross(v_eci);
+    //     Eigen::Vector3d centripetal_eci = earthRotationVector_eci.cross(earthRotationVector_eci.cross(r_eci));
+    //
+    //     std::cout << "coriolis_eci: " << coriolis_eci.transpose() << std::endl;
+    //     std::cout << "centripetal_eci: " << centripetal_eci.transpose() << std::endl;
+    //
+    //     // Sum all acceleration terms in ECI
+    //     Eigen::Vector3d a_eci = a_direct_eci + coriolis_eci + centripetal_eci;
+    //
+    //     std::cout << "Final a_eci: " << a_eci.transpose() << std::endl;
+    //     std::cout << "-------------------" << std::endl;
     //
     //     return std::make_tuple(r_eci, v_eci, a_eci);
     // }
+    std::tuple<Eigen::Vector3d, Eigen::Vector3d, Eigen::Vector3d> ecef2eci(Eigen::Vector3d& r_ecef, Eigen::Vector3d& v_ecef, Eigen::Vector3d& a_ecef, double timej2k) {
+        // IAU-2000 CIO-Based (ITRF to GCRF)
+
+        Eigen::Matrix3d dcm_itrf2gcrf = getDCM_itrf2gcrf(timej2k);
+        Eigen::Vector3d r_eci = dcm_itrf2gcrf * r_ecef;
+
+        Eigen::Matrix3d dcm_itrf2tirs = getDCM_itrf2tirs(timej2k);
+        Eigen::Matrix3d dcm_tirs2cirs = getDCM_tirs2cirs(timej2k);
+        Eigen::Matrix3d dcm_cirs2gcrf = getDCM_cirs2gcrf_lofi(timej2k);
+
+        Eigen::Vector3d r_tirs = dcm_itrf2tirs * r_ecef;
+        Eigen::Vector3d v_tirs = dcm_itrf2tirs * v_ecef;        // omega_polar is neglected here (assumed to be small)
+
+        Eigen::Vector3d earthRotationVector = {0.0, 0.0, UniversalConstants::EarthParams::ROTATION_RATE};
+
+        Eigen::Vector3d v_eci = dcm_cirs2gcrf * dcm_tirs2cirs * (dcm_itrf2tirs * v_ecef + earthRotationVector.cross(r_tirs));
+
+        Eigen::Vector3d omegaCrossOmega = earthRotationVector.cross(earthRotationVector);
+        Eigen::Vector3d a_eci = dcm_cirs2gcrf * dcm_tirs2cirs * (dcm_itrf2tirs * a_ecef + 2 * earthRotationVector.cross(v_tirs) + omegaCrossOmega.cross(r_tirs));      // omegaDot term is neglected
+
+        return std::make_tuple(r_eci, v_eci, a_eci);
+    }
 }

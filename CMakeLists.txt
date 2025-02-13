@@ -45,6 +45,7 @@ target_link_libraries(atlas
         geodetic_model_lib
         coordinate_frames_lib
         extract_time_and_pole_data_lib
+        planetary_ephemerides_lib
 )
 
 # Add include directories for the main target

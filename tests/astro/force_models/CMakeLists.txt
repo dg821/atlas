@@ -1,5 +1,6 @@
 set(TEST_TARGETS
-        unitTestNonsphericalForceModel
+        unitTestNonSphericalGravity
+        unitTestTwoBody
 )
 
 foreach(TARGET ${TEST_TARGETS})

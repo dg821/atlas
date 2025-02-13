@@ -36,9 +36,11 @@ double PerturbationMethod::computeMaxStep(const double sma, const double ecc, co
 
 Eigen::Vector3d PerturbationMethod::computeTotalAcceleration(double t, Eigen::Vector3d& r, Eigen::Vector3d& v, SpaceVehicle& sv) const {
     Eigen::Vector3d totalAcceleration = Eigen::Vector3d::Zero();
+    // auto [r_ecef, v_ecef] = geodeticModel::eci2ecef(r, v, t);
     for (auto forceModel : forceModels) {
         totalAcceleration = totalAcceleration + forceModel->computeAcceleration(t, r, v, sv);
     }
+    // auto [r_eci_out, v_eci_out, a_eci_out] = geodeticModel::ecef2eci(r_ecef, v_ecef, totalAcceleration, t);
     return totalAcceleration;
 }
 
@@ -64,10 +66,25 @@ PerturbationMethod::Vector6d Cowell::equationsOfMotion(const double t, const Vec
     Eigen::Vector3d v(stateVector(3), stateVector(4), stateVector(5));
 
     // Compute total acceleration from force models
-    Eigen::Vector3d pertAcceleration = computePerturbAcceleration(t, r, v, sv);
+    // Eigen::Vector3d pertAcceleration = computePerturbAcceleration(t, r, v, sv);
     Eigen::Vector3d totalAcceleration = computeTotalAcceleration(t, r, v, sv);
 
-    // Create and return the derivative of the state (dydt)
+    stateConversions::KeplerianElements cart = stateConversions::Cart2Kep(r, v);
+
+    Eigen::Vector3d h = r.cross(v);
+    double hMag = h.norm();
+
+//     std::cout << "Time: " << t << ",    AccTotX: " << totalAcceleration(0)
+//     << ",    AccTotY: " << totalAcceleration(1)
+//     << ",    AccTotZ: " << totalAcceleration(2)  << std::endl;
+//     std::cout << "sma: " << cart.sma << ",    ecc: " << cart.ecc << ",    inc: " << cart.inc
+// << ",    node: " << cart.node << ",    argP: " << cart.argP
+// << ",    truA: " << cart.truA << ",    rx: " << r(0) << ",    ry: " << r(1) << ",    rz: " << r(2)
+//     << ",    vx: " << v(0) << ",    vy: " << v(1) << ",    vz: " << v(2) << std::endl;
+//     std::cout << " " << std::endl;
+
+
+    // Create and return the d    // Create and return the derivative of the state (dydt)erivative of the state (dydt)
     Vector6d dydt(6);
     dydt << v(0), v(1), v(2),  // dx/dt = velocity
             totalAcceleration(0), totalAcceleration(1), totalAcceleration(2);  // dv/dt = acceleration

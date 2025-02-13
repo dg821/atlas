@@ -87,7 +87,7 @@ private:
     bool loadCoefficientsFromFile();
 
     std::vector<std::vector<double>> computeLegendrePolynomials(double phi) const;
-    double normalizeLegendreFunction(double Plm, double l, double m, double k) const;
+    double normalizeLegendreFunction(double Plm, int l, int m, int k) const;
 
 public:
     NonSphericalGravity(int l = DEFAULT_DEGREE, int m = DEFAULT_ORDER,
@@ -112,4 +112,10 @@ public:
     Eigen::Vector3d computeAcceleration(double t, const Eigen::Vector3d& r, const Eigen::Vector3d& v, const SpaceVehicle& sv) const override;
     std::string getName() const override;
 
+};
+
+class J2SimpleTest : public ForceModel {
+public:
+    Eigen::Vector3d computeAcceleration(double t, const Eigen::Vector3d& r, const Eigen::Vector3d& v, const SpaceVehicle& sv) const override;
+    std::string getName() const override;
 };

@@ -4,15 +4,9 @@ set(planetary_ephemerides_HEADER_FILES
         meeusEphemeris.h
 )
 
-add_library(${PLANETARY_EPHEMERIDES_LIB_NAME}
-        ${planetary_ephemerides_HEADER_FILES}
-)
-
-set_target_properties(${PLANETARY_EPHEMERIDES_LIB_NAME} PROPERTIES
-        LINKER_LANGUAGE CXX
-)
+add_library(${PLANETARY_EPHEMERIDES_LIB_NAME} INTERFACE)
 
 target_include_directories(${PLANETARY_EPHEMERIDES_LIB_NAME}
-        PUBLIC
+        INTERFACE
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
