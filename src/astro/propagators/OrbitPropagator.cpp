@@ -6,7 +6,7 @@
 
 OrbitPropagator::OrbitPropagator() {
     // Set default perturbation method (e.g., Cowell's method)
-    setPerturbationMethod(std::make_unique<Encke>());
+    setPerturbationMethod(std::make_unique<Cowell>());
 
     // Set default integration method (e.g., RK4)
     setIntegrationMethod(std::make_unique<Dopri87>());
@@ -28,11 +28,21 @@ void OrbitPropagator::setIntegrationMethod(std::unique_ptr<NumericalIntegrator> 
 }
 
 void OrbitPropagator::addForceModel(std::unique_ptr<ForceModel> model) {
-    forceModels.push_back(std::move(model));
-    updatePerturbationMethodDependencies();
+    // check if a force model of the same type already exists
+    std::string modelName = model->getName();
+    bool modelExists = std::any_of(forceModels.begin(), forceModels.end(),
+        [&modelName](const std::unique_ptr<ForceModel>& existingModel) {
+            return existingModel->getName() == modelName;
+        });
+
+    if (!modelExists) {
+        forceModels.push_back(std::move(model));
+        updatePerturbationMethodDependencies();
+    }
 }
 
 void OrbitPropagator::removeForceModel(const std::string& modelName) {
+    if (modelName == "TwoBody") return;
     forceModels.erase(
         std::remove_if(forceModels.begin(), forceModels.end(),
             [&modelName](const auto& model) { return model->getName() == modelName; }),

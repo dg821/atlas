@@ -44,6 +44,6 @@ namespace geodeticModel {
     std::tuple<Eigen::Vector3d, Eigen::Vector3d> ecef2eci(const Eigen::Vector3d& r_ecef, const Eigen::Vector3d& v_ecef, double timej2k);
     std::tuple<Eigen::Vector3d, Eigen::Vector3d> eci2ecef(const Eigen::Vector3d& r_eci, const Eigen::Vector3d& v_eci, double timej2k);
 
-    std::tuple<Eigen::Vector3d, Eigen::Vector3d, Eigen::Vector3d> ecef2eci(Eigen::Vector3d r_ecef, Eigen::Vector3d v_ecef, Eigen::Vector3d a_ecef, double timej2k);
+    std::tuple<Eigen::Vector3d, Eigen::Vector3d, Eigen::Vector3d> ecef2eci(Eigen::Vector3d& r_ecef, Eigen::Vector3d& v_ecef, Eigen::Vector3d& a_ecef, double timej2k);
 
 }

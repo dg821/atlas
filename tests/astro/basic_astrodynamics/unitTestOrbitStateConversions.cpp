@@ -68,9 +68,9 @@ TEST_P(StateConversionsParameterizedTest, CartesianKeplerianTest) {
         kep.truA = 0.0;
     }
 
-    node = MathFunctions::wrap2TwoPi(node);
-    argP = MathFunctions::wrap2TwoPi(argP);
-    truA = MathFunctions::wrap2TwoPi(truA);
+    node = mathFunctions::wrap2TwoPi(node);
+    argP = mathFunctions::wrap2TwoPi(argP);
+    truA = mathFunctions::wrap2TwoPi(truA);
 
 
     EXPECT_NEAR(sma, kep.sma, smaTol);
@@ -115,9 +115,9 @@ TEST_P(StateConversionsParameterizedTest, EqunioctalConversionTest) {
         kep.truA = 0.0;
     }
 
-    node = MathFunctions::wrap2TwoPi(node);
-    argP = MathFunctions::wrap2TwoPi(argP);
-    truA = MathFunctions::wrap2TwoPi(truA);
+    node = mathFunctions::wrap2TwoPi(node);
+    argP = mathFunctions::wrap2TwoPi(argP);
+    truA = mathFunctions::wrap2TwoPi(truA);
 
     EXPECT_NEAR(sma, kep.sma, smaTol);
     EXPECT_NEAR(ecc, kep.ecc, eccTol);

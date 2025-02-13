@@ -39,8 +39,9 @@ class SpaceVehicle {
     [[nodiscard]] std::optional<double> get_propellant_mass() const;
     [[nodiscard]] double get_period(double) const;
 
+  double get_period();
 
-  private:
+private:
     double mass_total_;
     double surface_area_;
     double mass_propellant_;

@@ -12,4 +12,6 @@ namespace mathFunctions {
     double wrap2TwoPi(double angle);
 
     double stableArcCos(double x);
+
+    double factorial(int x);
 }

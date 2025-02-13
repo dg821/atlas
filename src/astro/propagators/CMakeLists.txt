@@ -21,3 +21,10 @@ target_include_directories(${PROPAGATORS_LIB_NAME}
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+target_link_libraries(${PROPAGATORS_LIB_NAME}
+        PUBLIC
+        perturbation_methods_lib
+        integrators_lib
+        force_models_lib
+)

@@ -28,4 +28,17 @@ namespace mathFunctions {
         if (x >= 1.0) return 0.0;
         return std::acos(x);
     }
+
+    double factorial(int n) {
+        if (n < 0) {
+            throw std::invalid_argument("Factorial not defined for negative numbers");
+        }
+        if (n == 0) return 1.0;
+
+        double result = 1.0;
+        for (int i = 1; i <= n; i++) {
+            result *= i;
+        }
+        return result;
+    }
 }

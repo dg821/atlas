@@ -22,3 +22,10 @@ target_include_directories(${FORCE_MODELS_LIB_NAME}
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+target_link_libraries(${FORCE_MODELS_LIB_NAME}
+        PUBLIC
+        space_vehicle_lib
+)
+
+

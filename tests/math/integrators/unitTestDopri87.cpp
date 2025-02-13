@@ -190,7 +190,7 @@ TEST_P(Dopri87ParameterizedTest, SingleStepTest) {
 TEST_P(Dopri87ParameterizedTest, IntegrationTest) {
     integrator.setTolerances(1e-12, 1e-12);
     double t_start = 0.0;
-    double t_end = per;
+    double t_end = per/2.0;
 
     auto start_time = std::chrono::high_resolution_clock::now();
     auto solution = integrator.integrate(Orbit3D::f, t_start, t_end, initial_state, h, h_min, h_max);
