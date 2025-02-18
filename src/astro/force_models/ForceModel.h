@@ -75,7 +75,6 @@ private:
     static constexpr int DEFAULT_DEGREE = 4;
     static constexpr int MAX_ORDER = 20;
     static constexpr int MAX_DEGREE = 20;
-    static constexpr double numDiffTol = 1e-4;
 
     std::string coefficients_path;
 
@@ -86,6 +85,7 @@ private:
     void initializeCoefficients();
     bool loadCoefficientsFromFile();
 
+    double computeDiffStepSize(int l) const;
     std::vector<std::vector<double>> computeLegendrePolynomials(double phi) const;
     double normalizeLegendreFunction(double Plm, int l, int m, int k) const;
 

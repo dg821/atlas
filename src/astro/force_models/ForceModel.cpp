@@ -159,6 +159,13 @@ bool NonSphericalGravity::loadCoefficientsFromFile() {
     return true;
 }
 
+double NonSphericalGravity::computeDiffStepSize(int l) const {
+    // Estimate M₃ for degree l Legendre polynomial
+    double M3 = std::pow(l, 4);  // This is a rough estimate, can be refined
+    double epsilon = std::numeric_limits<double>::epsilon();
+    return std::cbrt(3.0 * epsilon / M3);
+}
+
 double NonSphericalGravity::normalizeLegendreFunction(double Plm, int l, int m, int k) const {
 
     double Plm_normalized = std::sqrt((2 - k) * (2 * l + 1) *
@@ -268,10 +275,14 @@ Eigen::Vector3d NonSphericalGravity::computeAcceleration(double t, const Eigen::
     double sinPhi = std::sin(phi);
     double cosPhi = std::cos(phi);
 
+    double diffStepSize = computeDiffStepSize(degree_l);
+
     // compute Legendre polynomials and derivatives
     auto Plm = computeLegendrePolynomials(phi);
-    auto Plm_minus = computeLegendrePolynomials(phi - numDiffTol);
-    auto Plm_plus = computeLegendrePolynomials(phi + numDiffTol);
+    auto Plm_minus2 = computeLegendrePolynomials(phi - 2*diffStepSize);
+    auto Plm_minus1 = computeLegendrePolynomials(phi - diffStepSize);
+    auto Plm_plus1 = computeLegendrePolynomials(phi + diffStepSize);
+    auto Plm_plus2 = computeLegendrePolynomials(phi + 2*diffStepSize);
 
 
     // initialize acceleration components (spherical coordinates)
@@ -289,7 +300,7 @@ Eigen::Vector3d NonSphericalGravity::computeAcceleration(double t, const Eigen::
             double cos_m_lambda = std::cos(m * lambda);
             double sin_m_lambda = std::sin(m * lambda);
 
-            double Plm_deriv = (Plm_plus[l][m] - Plm_minus[l][m]) / (2.0 * numDiffTol);
+            double Plm_deriv = (-Plm_plus2[l][m] + 8*Plm_plus1[l][m] - 8*Plm_minus1[l][m] + Plm_minus2[l][m]) / (12.0 * diffStepSize);
 
             dU_dr += Plm[l][m] *
                 (Clm[l][m] * cos_m_lambda + Slm[l][m] * sin_m_lambda);
