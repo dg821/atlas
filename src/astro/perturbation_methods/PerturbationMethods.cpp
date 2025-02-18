@@ -74,14 +74,14 @@ PerturbationMethod::Vector6d Cowell::equationsOfMotion(const double t, const Vec
     Eigen::Vector3d h = r.cross(v);
     double hMag = h.norm();
 
-//     std::cout << "Time: " << t << ",    AccTotX: " << totalAcceleration(0)
-//     << ",    AccTotY: " << totalAcceleration(1)
-//     << ",    AccTotZ: " << totalAcceleration(2)  << std::endl;
-//     std::cout << "sma: " << cart.sma << ",    ecc: " << cart.ecc << ",    inc: " << cart.inc
-// << ",    node: " << cart.node << ",    argP: " << cart.argP
-// << ",    truA: " << cart.truA << ",    rx: " << r(0) << ",    ry: " << r(1) << ",    rz: " << r(2)
-//     << ",    vx: " << v(0) << ",    vy: " << v(1) << ",    vz: " << v(2) << std::endl;
-//     std::cout << " " << std::endl;
+    std::cout << "Time: " << t << ",    AccTotX: " << totalAcceleration(0)
+    << ",    AccTotY: " << totalAcceleration(1)
+    << ",    AccTotZ: " << totalAcceleration(2)  << std::endl;
+    std::cout << "sma: " << cart.sma << ",    ecc: " << cart.ecc << ",    inc: " << cart.inc
+<< ",    node: " << cart.node << ",    argP: " << cart.argP
+<< ",    truA: " << cart.truA << ",    rx: " << r(0) << ",    ry: " << r(1) << ",    rz: " << r(2)
+    << ",    vx: " << v(0) << ",    vy: " << v(1) << ",    vz: " << v(2) << std::endl;
+    std::cout << " " << std::endl;
 
 
     // Create and return the d    // Create and return the derivative of the state (dydt)erivative of the state (dydt)
